@@ -4,17 +4,15 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: heavenly-postgres
-    restart: unless-stopped
+    restart: always
     environment:
-      POSTGRES_USER: heavenly
-      POSTGRES_PASSWORD: heavenly_secret
-      POSTGRES_DB: heavenly_events
-    ports:
-      - "5433:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-heavenly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-heavenly_production_secret_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-heavenly_events}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U heavenly -d heavenly_events"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-heavenly} -d ${POSTGRES_DB:-heavenly_events}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,19 +21,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: dev
     container_name: heavenly-app
-    restart: unless-stopped
+    restart: always
     ports:
-      - "3001:3000"
+      - "3000:3000"
     environment:
-      NODE_ENV: development
-      DATABASE_URL: postgresql://heavenly:heavenly_secret@postgres:5432/heavenly_events?schema=public
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:-postgresql://heavenly:heavenly_production_secret_2026@postgres:5432/heavenly_events?schema=public}
       PORT: 3000
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
+      SESSION_SECRET: ${SESSION_SECRET:-heavenly-events-super-secure-production-secret-2026}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://144.24.139.226}
     depends_on:
       postgres:
         condition: service_healthy
