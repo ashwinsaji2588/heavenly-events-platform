@@ -27,8 +27,8 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Login failed');
 
-      router.push('/desk');
-      router.refresh();
+      // Hard redirect to bypass Next.js router cache and ensure session cookies are sent
+      window.location.href = '/desk';
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
