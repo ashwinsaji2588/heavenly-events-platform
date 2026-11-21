@@ -138,10 +138,12 @@ export async function POST(req: Request) {
       user: sessionUser,
     });
 
+    const isHttps = process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false;
+
     // Set HTTP-only session cookie
     response.cookies.set('heavenly_session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
       sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60, // 7 days
