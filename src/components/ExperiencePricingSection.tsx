@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { Check, Sparkles, MessageCircle, ArrowUpRight } from 'lucide-react';
+import ScrollReveal from './ScrollReveal';
+import TiltCard from './TiltCard';
 
 interface Tier {
   id: string;
@@ -78,86 +80,77 @@ export default function ExperiencePricingSection() {
   return (
     <section className="py-24 bg-brand-deep/60 relative overflow-hidden border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-surface border border-white/10 text-brand-gold text-xs font-semibold tracking-wider uppercase">
-            <Sparkles className="w-3.5 h-3.5" />
-            Transparent Styling Tiers
+        <ScrollReveal direction="up">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-surface border border-white/10 text-brand-gold text-xs font-semibold tracking-wider uppercase">
+              <Sparkles className="w-3.5 h-3.5" />
+              Transparent Styling Tiers
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-serif text-brand-cream">
+              Investment & Experiences
+            </h2>
+            <p className="text-brand-muted text-sm sm:text-base">
+              Honest pricing with zero hidden add-ons. Every tier includes 3D visual previews, fresh flower guarantee, and professional on-time execution.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-serif text-brand-cream">
-            Investment & Experiences
-          </h2>
-          <p className="text-brand-muted text-sm sm:text-base">
-            Honest pricing with zero hidden add-ons. Every tier includes 3D visual previews, fresh flower guarantee, and professional on-time execution.
-          </p>
-        </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          {TIERS.map((tier) => (
-            <div
-              key={tier.id}
-              className={`relative rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 ${
-                tier.popular
-                  ? 'bg-brand-charcoal border-2 border-brand-gold shadow-2xl shadow-brand-gold/10 lg:-translate-y-2'
-                  : 'bg-brand-charcoal/50 border border-white/10 hover:border-white/20'
-              }`}
-            >
-              {tier.badge && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-brand-gold text-brand-dark font-semibold text-xs tracking-wide shadow-md whitespace-nowrap">
-                  {tier.badge}
-                </div>
-              )}
-
-              <div>
-                <div className="space-y-2 mb-6">
-                  <h3 className="text-2xl font-serif text-brand-cream">{tier.name}</h3>
-                  <p className="text-xs text-brand-muted min-h-[32px]">{tier.subtitle}</p>
-                </div>
-
-                <div className="mb-8 pb-6 border-b border-white/10">
-                  <div className="text-xs text-brand-gold font-mono uppercase tracking-wider">Estimated Budget</div>
-                  <div className="text-2xl sm:text-3xl font-serif font-bold text-brand-cream mt-1">
-                    {tier.priceRange}
-                  </div>
-                  <div className="text-[11px] text-brand-muted mt-1">
-                    *Customized precisely to venue dimensions & flower choice
-                  </div>
-                </div>
-
-                <div className="space-y-3 mb-8">
-                  <div className="text-xs font-semibold text-brand-cream/80 uppercase tracking-wider mb-2">
-                    Included in Experience:
-                  </div>
-                  {tier.features.map((feat, i) => (
-                    <div key={i} className="flex items-start gap-3 text-xs sm:text-sm text-brand-cream/90">
-                      <div className="w-4 h-4 rounded-full bg-brand-surface border border-brand-gold/40 flex items-center justify-center text-brand-gold flex-shrink-0 mt-0.5">
-                        <Check className="w-2.5 h-2.5" />
-                      </div>
-                      <span>{feat}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <a
-                  href={getWhatsAppLink(tier.whatsAppMsg)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-full py-4 px-6 rounded-full font-semibold text-sm transition-all flex items-center justify-center gap-2 shadow-lg ${
+          {TIERS.map((tier, idx) => (
+            <ScrollReveal key={tier.id} direction="up" delay={0.15 * (idx + 1)}>
+              <TiltCard className="h-full">
+                <div
+                  className={`relative rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 h-full ${
                     tier.popular
-                      ? 'bg-brand-gold text-brand-dark hover:bg-brand-goldHover shadow-brand-gold/20'
-                      : 'bg-brand-surface border border-white/10 text-brand-cream hover:bg-brand-surface/80'
+                      ? 'bg-brand-charcoal border-2 border-brand-gold shadow-2xl shadow-brand-gold/10'
+                      : 'bg-brand-charcoal/50 border border-white/5 hover:border-brand-gold/30'
                   }`}
                 >
-                  <MessageCircle className="w-4 h-4" />
-                  {tier.ctaText}
-                  <ArrowUpRight className="w-4 h-4" />
-                </a>
-                <div className="text-[11px] text-center text-brand-muted mt-2">
-                  Direct WhatsApp chat • Immediate date check
+                  {tier.badge && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 py-1 px-4 rounded-full bg-brand-gold text-brand-dark text-xs font-semibold tracking-wide shadow-md whitespace-nowrap">
+                      {tier.badge}
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-brand-gold font-semibold">
+                      {tier.name}
+                    </div>
+                    <div className="text-xs text-brand-muted mt-1">{tier.subtitle}</div>
+
+                    <div className="mt-4 mb-6 pt-4 border-t border-white/5">
+                      <div className="text-2xl sm:text-3xl font-serif text-brand-cream font-bold">
+                        {tier.priceRange}
+                      </div>
+                      <div className="text-[11px] text-brand-muted mt-1">Starting estimation • All included</div>
+                    </div>
+
+                    <ul className="space-y-3 mb-8">
+                      {tier.features.map((feat, i) => (
+                        <li key={i} className="text-xs sm:text-sm text-brand-cream/90 flex items-start gap-2.5">
+                          <Check className="w-4 h-4 text-brand-gold flex-shrink-0 mt-0.5" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <a
+                    href={getWhatsAppLink(tier.whatsAppMsg)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`py-3.5 px-6 rounded-full font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg ${
+                      tier.popular
+                        ? 'bg-brand-gold text-brand-dark hover:bg-brand-goldHover shadow-brand-gold/20'
+                        : 'bg-brand-surface hover:bg-brand-gold hover:text-brand-dark text-brand-cream border border-white/10'
+                    }`}
+                  >
+                    <span>{tier.ctaText}</span>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
                 </div>
-              </div>
-            </div>
+              </TiltCard>
+            </ScrollReveal>
           ))}
         </div>
       </div>

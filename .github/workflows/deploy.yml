@@ -20,6 +20,8 @@ jobs:
           username: ${{ secrets.ORACLE_USERNAME || 'ubuntu' }}
           key: ${{ secrets.ORACLE_SSH_KEY }}
           port: 22
+          timeout: 600s
+          command_timeout: 600s
           script: |
             echo "=== 1. Pulling latest code on Oracle VM ==="
             cd ~/heavenly-events-platform
@@ -36,7 +38,22 @@ jobs:
             echo "=== 4. Syncing database schema ==="
             sudo docker exec heavenly-app npx prisma db push --skip-generate || true
             
-            echo "=== 5. Deployment Health Check ==="
-            sleep 3
-            curl -I http://127.0.0.1:3000 || exit 1
+            echo "=== 5. Deployment Health Check with Retry ==="
+            SUCCESS=0
+            for i in $(seq 1 15); do
+              if curl -s -f -o /dev/null -w "%{http_code}" http://127.0.0.1:3000 | grep -q "200\|304\|307"; then
+                echo "✅ Health check passed: Next.js is responding on port 3000!"
+                SUCCESS=1
+                break
+              fi
+              echo "Waiting for Next.js app to become healthy (attempt $i/15)..."
+              sleep 3
+            done
+
+            if [ $SUCCESS -ne 1 ]; then
+              echo "❌ Health check timed out after 45 seconds"
+              sudo docker logs --tail 40 heavenly-app
+              exit 1
+            fi
+
             echo "🎉 Continuous Deployment successfully completed on Oracle VM!"
