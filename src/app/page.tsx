@@ -8,6 +8,8 @@ import StageCoverflowGallery from '@/components/StageCoverflowGallery';
 import EventTimelineSection from '@/components/EventTimelineSection';
 import ExperiencePricingSection from '@/components/ExperiencePricingSection';
 import TestimonialRatingSection from '@/components/TestimonialRatingSection';
+import VenueMarquee from '@/components/VenueMarquee';
+import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import { ArrowUpRight, Phone, Instagram, Calendar, MapPin, Sparkles, MessageCircle, Users, Award, ShieldCheck } from 'lucide-react';
 
 export default function HomePage() {
@@ -130,6 +132,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Kerala Prestigious Venues Marquee */}
+      <VenueMarquee />
+
       {/* OriginKit-Inspired 3D Coverflow Stage Gallery */}
       <StageCoverflowGallery />
 
@@ -207,6 +212,9 @@ export default function HomePage() {
           <LeadInquiryForm />
         </div>
       </section>
+
+      {/* Floating Concierge */}
+      <FloatingWhatsApp />
 
       {/* Footer */}
       <Footer />
