@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Heavenly Events plans weddings, receptions and smaller celebrations in Punalur. Tell us what you're planning.">
+<meta name="theme-color" content="#191e18">
+<title>Heavenly Events | Event Planning in Punalur</title>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link rel="stylesheet" href="styles.css">
+<script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+</head>
+<body>
+<header class="hero">
+ <div class="hero-image" aria-hidden="true"><img alt="" fetchpriority="high" sizes="100vw" srcset="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=900&amp;q=85 900w, https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=2000&amp;q=85 2000w" src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1600&amp;q=85" onerror="this.onerror=null;this.removeAttribute('srcset');this.src='heavenly-events-september.jpg'"></div>
+ <div class="wrap">
+  <nav class="nav" aria-label="Main navigation">
+   <a class="brand" href="#" aria-label="Heavenly Events home"><span class="mark" aria-hidden="true">✦</span> Heavenly Events</a>
+   <div class="navlinks"><a href="#events">Events</a><a href="#work">Our work</a><a href="#inquiry">Contact</a></div>
+  </nav>
+  <div class="hero-copy">
+   <div class="eyebrow">Event planning · Punalur</div>
+   <h1><span class="headline-line"><span>Make it a day</span></span> <span class="headline-line"><span><em>to remember.</em></span></span></h1>
+   <p>From wedding ceremonies to intimate celebrations, we help you plan an event that feels like yours.</p>
+   <div class="actions"><a class="btn primary" href="#inquiry">Get a quote <span aria-hidden="true">↗</span></a><a class="btn ghost" href="#work">View our work</a></div>
+  </div>
+ </div>
+</header>
+<main>
+ <section id="events" aria-labelledby="events-heading">
+  <div class="wrap">
+   <div class="section-head" data-reveal><div><div class="eyebrow">Event planning</div><h2 id="events-heading">What are you celebrating?</h2></div><p>Explore ideas for your occasion. Sample photos show styling inspiration.</p></div>
+   <div class="cards">
+    <button class="card" type="button" data-reveal data-event="Wedding" data-description="Share your ceremony plans, venue, and what you have in mind for the setup."><img src="https://images.unsplash.com/photo-1779308936221-89739e035a53?auto=format&amp;fit=crop&amp;w=800&amp;q=78" alt="" loading="lazy"><span class="card-label">Weddings <b aria-hidden="true">↗</b></span></button>
+    <button class="card" type="button" data-reveal data-reveal-delay="55" data-event="Reception" data-description="Tell us about your venue, the scale of your reception, and any styling ideas."><img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&amp;fit=crop&amp;w=800&amp;q=78" alt="" loading="lazy"><span class="card-label">Receptions <b aria-hidden="true">↗</b></span></button>
+    <button class="card" type="button" data-reveal data-reveal-delay="110" data-event="Mini event" data-description="Let us know what you’re celebrating and the kind of setup you’d like for your gathering."><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&amp;fit=crop&amp;w=800&amp;q=78" alt="" loading="lazy"><span class="card-label">Mini events <b aria-hidden="true">↗</b></span></button>
+   </div>
+<nav class="service-links" aria-label="Service guides"><a class="text-link" href="weddings.html">Wedding planning</a><a class="text-link" href="receptions.html">Reception planning</a><a class="text-link" href="mini-events.html">Intimate event planning</a></nav>  </div>
+ </section>
+ <section class="work" id="work" aria-labelledby="work-heading">
+  <div class="wrap"><div data-reveal><h2 id="work-heading">See our recent setups</h2><p>Browse real event photos and reels from Heavenly Events.</p></div><a class="btn dark" href="https://www.instagram.com/__heavenly_events___/" target="_blank" rel="noopener noreferrer">View on Instagram ↗</a><a class="featured-photo" data-reveal data-photo href="https://www.instagram.com/__heavenly_events___/p/DdyoXSpmLHA/" target="_blank" rel="noopener noreferrer"><img src="heavenly-events-september.jpg" alt="" loading="lazy" decoding="async"><span>View the September photo gallery &nearr;</span></a><div class="post-links" data-reveal data-reveal-delay="120" aria-label="Recent Instagram posts"><a class="text-link" href="https://www.instagram.com/__heavenly_events___/p/DdyoXSpmLHA/" target="_blank" rel="noopener noreferrer">September photo gallery ↗</a><a class="text-link" href="https://www.instagram.com/__heavenly_events___/reel/DdY3XauRv8l/" target="_blank" rel="noopener noreferrer">Stage setup reel ↗</a><a class="text-link" href="https://www.instagram.com/__heavenly_events___/p/DdgtOGyGJxT/" target="_blank" rel="noopener noreferrer">More event photos ↗</a></div></div>
+ </section>
+ <section class="inquiry" id="inquiry" aria-labelledby="inquiry-heading">
+  <div class="wrap">
+   <div data-reveal><div class="eyebrow">Contact Heavenly Events</div><h2 id="inquiry-heading" tabindex="-1">Tell us what<br>you’re planning.</h2><p>Prepare a short inquiry and share it with Heavenly Events on Instagram, or call <a class="text-link" href="tel:+919074624023">+91 90746 24023</a>.</p></div>
+   <form class="form" id="quote" data-reveal data-reveal-delay="100">
+    <label>Name <input name="name" autocomplete="name" required maxlength="80"></label>
+    <label>Event type <select name="event" required><option value="">Select one</option><option>Wedding</option><option>Reception</option><option>Mini event</option><option>Other</option></select></label>
+    <label>Event date (optional) <input name="date" type="date"></label>
+    <label>Event location <input name="location" required maxlength="100" placeholder="Town or venue"></label>
+    <label class="full">Anything else? (optional) <textarea name="details" rows="3" maxlength="650"></textarea></label>
+    <div class="full actions"><button class="btn primary" type="submit">Prepare inquiry <span aria-hidden="true">↗</span></button><a class="btn ghost" href="https://www.instagram.com/__heavenly_events___/" target="_blank" rel="noopener noreferrer">Open Instagram</a></div>
+    <pre class="full message" id="message" hidden tabindex="0"></pre>
+    <p class="full feedback" id="feedback" role="status"></p>
+   </form>
+  </div>
+ </section>
+</main>
+<footer><div class="wrap" data-reveal><a class="brand" href="#"><span class="mark" aria-hidden="true">✦</span> Heavenly Events</a><div class="links"><span>Punalur, Kerala</span><a href="tel:+919074624023">Call</a><a href="https://www.instagram.com/__heavenly_events___/">Instagram</a></div></div></footer>
+<dialog id="event-dialog" aria-labelledby="dialog-title"><button type="button" class="close" aria-label="Close" autofocus>×</button><img alt=""><div class="dialog-body"><h2 id="dialog-title"></h2><p></p><div class="actions"><button type="button" class="btn dark" id="choose-event">Ask about this event ↗</button></div></div></dialog>
+<script src="site.js"></script>
+</body>
+</html>

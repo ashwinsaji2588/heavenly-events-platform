@@ -1,0 +1,44 @@
+name: heavenly-events
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: heavenly-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: heavenly
+      POSTGRES_PASSWORD: heavenly_secret
+      POSTGRES_DB: heavenly_events
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U heavenly -d heavenly_events"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: heavenly-app
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://heavenly:heavenly_secret@postgres:5432/heavenly_events?schema=public
+      PORT: 3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
