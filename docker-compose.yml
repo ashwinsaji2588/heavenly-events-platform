@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-heavenly}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-heavenly_production_secret_2026}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-heavenly_secret}
       POSTGRES_DB: ${POSTGRES_DB:-heavenly_events}
     ports:
       - "${DB_PORT:-5433}:5432"
@@ -29,7 +29,7 @@ services:
       - "${APP_PORT:-3001}:3000"
     environment:
       NODE_ENV: production
-      DATABASE_URL: ${DATABASE_URL:-postgresql://heavenly:heavenly_production_secret_2026@postgres:5432/heavenly_events?schema=public}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-heavenly}:${POSTGRES_PASSWORD:-heavenly_secret}@postgres:5432/${POSTGRES_DB:-heavenly_events}?schema=public
       PORT: 3000
       SESSION_SECRET: ${SESSION_SECRET:-heavenly-events-super-secure-production-secret-2026}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3001}
