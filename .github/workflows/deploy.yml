@@ -37,5 +37,6 @@ jobs:
             sudo docker exec heavenly-app npx prisma db push --skip-generate || true
             
             echo "=== 5. Deployment Health Check ==="
+            sleep 3
             curl -I http://127.0.0.1:3000 || exit 1
             echo "🎉 Continuous Deployment successfully completed on Oracle VM!"
