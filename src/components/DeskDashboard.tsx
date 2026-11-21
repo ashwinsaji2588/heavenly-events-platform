@@ -17,7 +17,7 @@ import {
   RefreshCw,
   FolderOpen,
   FileText,
-  DollarSign,
+  IndianRupee,
   Trash2,
   ExternalLink,
   LogOut,
@@ -541,7 +541,7 @@ export default function DeskDashboard({
                 : 'text-brand-muted hover:text-brand-cream'
             }`}
           >
-            <DollarSign className="w-3.5 h-3.5" />
+            <IndianRupee className="w-3.5 h-3.5" />
             Payments & Ledger ({allPayments.length})
           </button>
           <button
@@ -582,7 +582,7 @@ export default function DeskDashboard({
                       colLeads.map((lead) => (
                         <div
                           key={lead.id}
-                          className="bg-brand-charcoal border border-white/10 rounded-xl p-4 shadow-md hover:border-brand-gold/40 transition-all flex flex-col justify-between space-y-3"
+                          className="bg-brand-charcoal border border-white/10 rounded-xl p-4 shadow-md hover:border-brand-gold/40 transition-all flex flex-col justify-between space-y-3 overflow-hidden"
                         >
                           <div>
                             <div className="flex items-start justify-between gap-2">
@@ -639,12 +639,13 @@ export default function DeskDashboard({
                             </div>
                           )}
 
-                          {/* Quick Actions */}
-                          <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1.5">
+                          {/* Quick Actions Toolbar */}
+                          <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-1">
+                            {/* Client Contact */}
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
                               <a
                                 href={`tel:${lead.clientPhone}`}
-                                title="Call Client"
+                                title={`Call ${lead.clientName} (${lead.clientPhone})`}
                                 className="w-7 h-7 rounded-lg bg-brand-surface text-brand-cream hover:bg-brand-gold hover:text-brand-dark transition-colors flex items-center justify-center text-xs"
                               >
                                 <Phone className="w-3 h-3" />
@@ -653,14 +654,15 @@ export default function DeskDashboard({
                                 href={`https://wa.me/${lead.clientPhone.replace(/[^0-9]/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                title="Open WhatsApp"
+                                title={`WhatsApp ${lead.clientName}`}
                                 className="w-7 h-7 rounded-lg bg-emerald-950/60 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center text-xs"
                               >
                                 <MessageCircle className="w-3 h-3" />
                               </a>
                             </div>
 
-                            <div className="flex items-center gap-1.5">
+                            {/* Operations: Pay / Visit / Quote */}
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
                               <button
                                 onClick={() => {
                                   setSelectedLeadForPayment(lead);
@@ -672,10 +674,10 @@ export default function DeskDashboard({
                                   setRecordedPaymentResult(null);
                                   setPaymentModalOpen(true);
                                 }}
-                                className="text-[10px] py-1 px-2 rounded-lg bg-emerald-950/60 text-emerald-300 hover:bg-emerald-600 hover:text-white transition-colors font-medium flex items-center gap-1"
-                                title="Record Advance or Milestone Payment"
+                                className="w-7 h-7 rounded-lg bg-emerald-950/60 text-emerald-300 hover:bg-emerald-600 hover:text-white transition-colors flex items-center justify-center font-bold text-xs"
+                                title="Record Advance or Milestone Payment (₹)"
                               >
-                                <DollarSign className="w-2.5 h-2.5" /> ₹ Pay
+                                ₹
                               </button>
 
                               <button
@@ -684,9 +686,10 @@ export default function DeskDashboard({
                                   setVisitLocation(lead.venueName || `${lead.venueCity || 'Punalur'}`);
                                   setVisitModalOpen(true);
                                 }}
-                                className="text-[10px] py-1 px-2 rounded-lg bg-brand-surface text-brand-gold hover:bg-brand-gold hover:text-brand-dark transition-colors font-medium flex items-center gap-1"
+                                className="w-7 h-7 rounded-lg bg-brand-surface text-brand-gold hover:bg-brand-gold hover:text-brand-dark transition-colors flex items-center justify-center text-xs"
+                                title="Schedule Venue Site Visit"
                               >
-                                <Calendar className="w-2.5 h-2.5" /> Visit
+                                <Calendar className="w-3 h-3" />
                               </button>
 
                               <button
@@ -695,9 +698,10 @@ export default function DeskDashboard({
                                   setGeneratedQuoteResult(null);
                                   setQuoteModalOpen(true);
                                 }}
-                                className="text-[10px] py-1 px-2 rounded-lg bg-brand-surface text-indigo-300 hover:bg-indigo-600 hover:text-white transition-colors font-medium flex items-center gap-1"
+                                className="w-7 h-7 rounded-lg bg-brand-surface text-indigo-300 hover:bg-indigo-600 hover:text-white transition-colors flex items-center justify-center text-xs"
+                                title="Draft Official Proposal Quote"
                               >
-                                <FileText className="w-2.5 h-2.5" /> Quote
+                                <FileText className="w-3 h-3" />
                               </button>
                             </div>
                           </div>
