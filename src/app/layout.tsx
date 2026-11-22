@@ -1,14 +1,18 @@
 import type { Metadata, Viewport } from "next";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Heavenly Events | Luxury Event Planning & Stage Décor in Punalur",
+  title: "Occasion Desk | The Operating System for Event Planners, Caterers & Décor Studios",
   description:
-    "Heavenly Events crafts bespoke weddings, grand receptions, and intimate celebrations in Punalur, Kerala. View our setups and plan your celebration.",
+    "The multi-tenant B2B platform for event management companies, catering firms, stage décor studios, and AV crews. Capture inquiries, manage bookings, coordinate partner teams, and track milestone advances.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#141813",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf8f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#141813" },
+  ],
 };
 
 export default function RootLayout({
@@ -17,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -26,8 +30,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-brand-dark text-brand-cream selection:bg-brand-gold selection:text-brand-dark">
-        {children}
+      <body className="min-h-screen bg-brand-dark text-brand-cream selection:bg-brand-gold selection:text-brand-dark antialiased transition-colors duration-200">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

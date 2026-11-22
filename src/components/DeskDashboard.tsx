@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
 import {
   Calendar,
   Clock,
@@ -23,6 +24,8 @@ import {
   LogOut,
   Users,
   Key,
+  Utensils,
+  Tag,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -91,11 +94,13 @@ export default function DeskDashboard({
   partners,
   initialTeam = [],
   currentUser,
+  organization,
 }: {
   initialLeads: Lead[];
   partners: { id: string; fullName: string }[];
   initialTeam?: TeamMember[];
   currentUser?: { id: string; email: string; fullName: string; role: string };
+  organization?: { id?: string; name: string; slug: string; phone?: string; email?: string; settings?: Record<string, unknown> };
 }) {
   const router = useRouter();
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
@@ -108,6 +113,69 @@ export default function DeskDashboard({
   const [teamModalOpen, setTeamModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedQuoteResult, setGeneratedQuoteResult] = useState<{ proposalUrl: string; clientWhatsAppUrl: string } | null>(null);
+
+  // Manual Booking Form State
+  const [addBookingModalOpen, setAddBookingModalOpen] = useState(false);
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientPhone, setNewClientPhone] = useState('+91 ');
+  const [newClientEmail, setNewClientEmail] = useState('');
+  const [newOccasionType, setNewOccasionType] = useState('Traditional & Modern Wedding');
+  const [newTargetDate, setNewTargetDate] = useState('');
+  const [newVenueName, setNewVenueName] = useState('');
+  const [newVenueCity, setNewVenueCity] = useState('');
+  const [newGuestCount, setNewGuestCount] = useState('');
+  const [newDiningType, setNewDiningType] = useState('Buffet & Live Counters');
+  const [newBudgetRange, setNewBudgetRange] = useState('₹5,00,000 - ₹10,00,000');
+  const [newInitialStatus, setNewInitialStatus] = useState('NEW');
+  const [newAssignedUser, setNewAssignedUser] = useState(partners[0]?.id || '');
+  const [newNotes, setNewNotes] = useState('');
+  const [bookingError, setBookingError] = useState<string | null>(null);
+
+  async function handleCreateBooking(e: React.FormEvent) {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setBookingError(null);
+
+    try {
+      const res = await fetch('/api/desk/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: newClientName,
+          clientPhone: newClientPhone,
+          clientEmail: newClientEmail || null,
+          occasionType: newOccasionType,
+          targetDate: newTargetDate || null,
+          venueName: newVenueName || null,
+          venueCity: newVenueCity || null,
+          guestCount: newGuestCount ? Number(newGuestCount) : null,
+          budgetRange: newBudgetRange || null,
+          status: newInitialStatus,
+          assignedUserId: newAssignedUser || null,
+          notes: newNotes ? `${newNotes}${newDiningType ? ` • Catering: ${newDiningType}` : ''}` : newDiningType ? `Catering: ${newDiningType}` : null,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create booking');
+
+      setLeads((prev) => [data.lead, ...prev]);
+      setAddBookingModalOpen(false);
+      setNewClientName('');
+      setNewClientPhone('+91 ');
+      setNewClientEmail('');
+      setNewTargetDate('');
+      setNewVenueName('');
+      setNewVenueCity('');
+      setNewGuestCount('');
+      setNewNotes('');
+    } catch (err: unknown) {
+      if (err instanceof Error) setBookingError(err.message);
+      else setBookingError('Failed to create booking');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   // Payment Form State
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -433,47 +501,56 @@ export default function DeskDashboard({
   return (
     <div className="min-h-screen bg-brand-dark text-brand-cream pb-24">
       {/* Top Bar */}
-      <header className="sticky top-0 z-40 bg-brand-charcoal/90 backdrop-blur-xl border-b border-white/5">
+      <header className="sticky top-0 z-40 bg-brand-charcoal/90 backdrop-blur-xl border-b border-white/5 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="font-serif text-lg text-brand-cream hover:text-brand-gold transition-colors flex items-center gap-2">
               <span className="text-brand-gold">✦</span>
-              <span>Heavenly Events</span>
+              <span className="font-bold">{organization?.name || 'Occasion Desk'}</span>
             </Link>
             <span className="text-xs px-2.5 py-1 rounded-full bg-brand-gold/10 text-brand-gold font-medium border border-brand-gold/20">
               Occasion Desk CRM
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Theme Switcher */}
+            <ThemeToggle />
+
+            {/* + Add Booking Primary Button */}
+            <button
+              onClick={() => {
+                setBookingError(null);
+                setAddBookingModalOpen(true);
+              }}
+              className="py-1.5 px-3.5 rounded-xl bg-brand-gold text-brand-dark font-bold text-xs hover:bg-brand-goldHover transition-all flex items-center gap-1.5 shadow-md shadow-brand-gold/15 active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>+ Add Booking</span>
+            </button>
+
             {currentUser && (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 pl-2 border-l border-white/10">
                 <div className="text-right hidden sm:block">
                   <div className="text-xs font-medium text-brand-cream">{currentUser.fullName}</div>
                   <div className="text-[10px] text-brand-gold uppercase tracking-wider">{currentUser.role}</div>
                 </div>
                 <button
                   onClick={() => setPasswordModalOpen(true)}
-                  className="py-1.5 px-3 rounded-lg bg-brand-surface hover:border-brand-gold/40 border border-white/10 text-xs text-brand-muted hover:text-brand-cream flex items-center gap-1.5 transition-colors"
+                  className="py-1.5 px-2.5 rounded-lg bg-brand-surface hover:border-brand-gold/40 border border-white/10 text-xs text-brand-muted hover:text-brand-cream flex items-center gap-1 transition-colors"
                   title="Update Password"
                 >
                   <Key className="w-3.5 h-3.5 text-brand-gold" />
-                  <span className="hidden md:inline">Password</span>
                 </button>
                 <button
                   onClick={handleSignOut}
-                  className="py-1.5 px-3 rounded-lg bg-brand-surface hover:bg-red-950/60 hover:text-red-300 border border-white/10 text-xs text-brand-muted flex items-center gap-1.5 transition-colors"
+                  className="py-1.5 px-2.5 rounded-lg bg-brand-surface hover:bg-red-950/60 hover:text-red-300 border border-white/10 text-xs text-brand-muted flex items-center gap-1 transition-colors"
+                  title="Sign Out"
                 >
-                  <LogOut className="w-3.5 h-3.5" /> Sign Out
+                  <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
-            <Link
-              href="/"
-              className="py-1.5 px-4 rounded-lg bg-brand-surface border border-white/10 text-xs text-brand-cream hover:bg-brand-charcoal transition-colors hidden sm:inline-block"
-            >
-              Portfolio ↗
-            </Link>
           </div>
         </div>
       </header>
@@ -511,50 +588,78 @@ export default function DeskDashboard({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-b border-white/10 pb-4 mb-6 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('pipeline')}
-            className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
-              activeTab === 'pipeline'
-                ? 'bg-brand-gold text-brand-dark'
-                : 'text-brand-muted hover:text-brand-cream'
-            }`}
-          >
-            Pipeline Board
-          </button>
-          <button
-            onClick={() => setActiveTab('visits')}
-            className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'visits'
-                ? 'bg-brand-gold text-brand-dark'
-                : 'text-brand-muted hover:text-brand-cream'
-            }`}
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            Site Visit Agenda ({allVisits.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('ledger')}
-            className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'ledger'
-                ? 'bg-brand-gold text-brand-dark'
-                : 'text-brand-muted hover:text-brand-cream'
-            }`}
-          >
-            <IndianRupee className="w-3.5 h-3.5" />
-            Payments & Ledger ({allPayments.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('team')}
-            className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === 'team'
-                ? 'bg-brand-gold text-brand-dark'
-                : 'text-brand-muted hover:text-brand-cream'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5" />
-            Team & Planners ({team.length})
-          </button>
+        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6 gap-4 overflow-x-auto">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveTab('pipeline')}
+              className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
+                activeTab === 'pipeline'
+                  ? 'bg-brand-gold text-brand-dark'
+                  : 'text-brand-muted hover:text-brand-cream'
+              }`}
+            >
+              Pipeline Board
+            </button>
+            <button
+              onClick={() => setActiveTab('visits')}
+              className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                activeTab === 'visits'
+                  ? 'bg-brand-gold text-brand-dark'
+                  : 'text-brand-muted hover:text-brand-cream'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              Visits &amp; Tastings ({allVisits.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('ledger')}
+              className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                activeTab === 'ledger'
+                  ? 'bg-brand-gold text-brand-dark'
+                  : 'text-brand-muted hover:text-brand-cream'
+              }`}
+            >
+              <IndianRupee className="w-3.5 h-3.5" />
+              Ledger &amp; Advances ({allPayments.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('team')}
+              className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                activeTab === 'team'
+                  ? 'bg-brand-gold text-brand-dark'
+                  : 'text-brand-muted hover:text-brand-cream'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              Partners &amp; Team ({team.length})
+            </button>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => {
+                setBookingError(null);
+                setAddBookingModalOpen(true);
+              }}
+              className="py-1.5 px-3 rounded-lg bg-brand-gold/15 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold hover:text-brand-dark font-semibold text-xs transition-colors flex items-center gap-1"
+            >
+              <Plus className="w-3 h-3" /> + Add Booking
+            </button>
+            <button
+              onClick={() => {
+                setCreatedMemberResult(null);
+                setNewMemberName('');
+                setNewMemberEmail('');
+                setNewMemberPhone('+91 ');
+                setNewMemberRole('PLANNER');
+                setNewMemberPassword('Partner@2026!');
+                setTeamModalOpen(true);
+              }}
+              className="py-1.5 px-3 rounded-lg bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/10 font-medium text-xs transition-colors flex items-center gap-1"
+            >
+              <Users className="w-3 h-3" /> + Enroll Partner
+            </button>
+          </div>
         </div>
 
         {/* View 1: Pipeline Board */}
@@ -1705,6 +1810,271 @@ export default function DeskDashboard({
                   {isChangingPassword ? 'Updating...' : 'Save New Password'}
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Manual Booking Creation Modal (+ Add Booking) */}
+      {addBookingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-brand-charcoal border border-brand-gold/40 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-4 border-b border-white/5">
+              <div className="flex items-center gap-3">
+                <span className="w-10 h-10 rounded-xl bg-brand-gold/15 text-brand-gold flex items-center justify-center font-bold text-lg border border-brand-gold/30">
+                  +
+                </span>
+                <div>
+                  <h3 className="font-serif text-xl text-brand-cream font-medium">Add New Booking</h3>
+                  <p className="text-xs text-brand-muted">Log phone calls, office walk-ins, and direct partner referrals</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setAddBookingModalOpen(false)}
+                className="text-brand-muted hover:text-brand-cream text-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            {bookingError && (
+              <div className="p-3.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 text-xs">
+                {bookingError}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateBooking} className="space-y-5">
+              
+              {/* Section 1: Client Info */}
+              <div className="space-y-3">
+                <div className="text-xs font-semibold uppercase tracking-wider text-brand-gold pb-1 border-b border-white/5 flex items-center gap-2">
+                  <User className="w-3.5 h-3.5" /> 1. Client Information
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Client / Couple Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newClientName}
+                      onChange={(e) => setNewClientName(e.target.value)}
+                      placeholder="e.g. Rahul &amp; Ananya"
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Mobile Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={newClientPhone}
+                      onChange={(e) => setNewClientPhone(e.target.value)}
+                      placeholder="+91 98470 12345"
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                    Client Email (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    value={newClientEmail}
+                    onChange={(e) => setNewClientEmail(e.target.value)}
+                    placeholder="client@gmail.com"
+                    className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Section 2: Event & Venue Details */}
+              <div className="space-y-3 pt-2">
+                <div className="text-xs font-semibold uppercase tracking-wider text-brand-gold pb-1 border-b border-white/5 flex items-center gap-2">
+                  <Calendar className="w-3.5 h-3.5" /> 2. Event &amp; Venue Details
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Occasion Type *
+                    </label>
+                    <select
+                      value={newOccasionType}
+                      onChange={(e) => setNewOccasionType(e.target.value)}
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    >
+                      <option value="Traditional &amp; Modern Wedding">Traditional &amp; Modern Wedding</option>
+                      <option value="Grand Reception &amp; Gala">Grand Reception &amp; Gala</option>
+                      <option value="Catering &amp; Banquet Feast">Catering &amp; Banquet Feast</option>
+                      <option value="Stage Architecture &amp; Décor">Stage Architecture &amp; Décor</option>
+                      <option value="Sound, Lighting &amp; AV Production">Sound, Lighting &amp; AV Production</option>
+                      <option value="Ring Ceremony &amp; Engagement">Ring Ceremony &amp; Engagement</option>
+                      <option value="Corporate Event &amp; Conference">Corporate Event &amp; Conference</option>
+                      <option value="Birthday &amp; Milestone Celebration">Birthday &amp; Milestone Celebration</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Target Event Date
+                    </label>
+                    <input
+                      type="date"
+                      value={newTargetDate}
+                      onChange={(e) => setNewTargetDate(e.target.value)}
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Auditorium / Venue Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newVenueName}
+                      onChange={(e) => setNewVenueName(e.target.value)}
+                      placeholder="e.g. The River Palace Auditorium"
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      City / Location
+                    </label>
+                    <input
+                      type="text"
+                      value={newVenueCity}
+                      onChange={(e) => setNewVenueCity(e.target.value)}
+                      placeholder="e.g. Punalur, Kollam"
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Scope, Catering & Budget */}
+              <div className="space-y-3 pt-2">
+                <div className="text-xs font-semibold uppercase tracking-wider text-brand-gold pb-1 border-b border-white/5 flex items-center gap-2">
+                  <Utensils className="w-3.5 h-3.5" /> 3. Scope &amp; Catering Format
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Guest Headcount
+                    </label>
+                    <input
+                      type="number"
+                      value={newGuestCount}
+                      onChange={(e) => setNewGuestCount(e.target.value)}
+                      placeholder="e.g. 800"
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Catering / Scope Style
+                    </label>
+                    <input
+                      type="text"
+                      value={newDiningType}
+                      onChange={(e) => setNewDiningType(e.target.value)}
+                      placeholder="e.g. 300 Veg / 500 Non-Veg"
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Estimated Budget (₹)
+                    </label>
+                    <input
+                      type="text"
+                      value={newBudgetRange}
+                      onChange={(e) => setNewBudgetRange(e.target.value)}
+                      placeholder="e.g. ₹5,00,000 - ₹10,00,000"
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4: Stage & Assignment */}
+              <div className="space-y-3 pt-2">
+                <div className="text-xs font-semibold uppercase tracking-wider text-brand-gold pb-1 border-b border-white/5 flex items-center gap-2">
+                  <Users className="w-3.5 h-3.5" /> 4. Pipeline Stage &amp; Assignment
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Initial Status in Pipeline
+                    </label>
+                    <select
+                      value={newInitialStatus}
+                      onChange={(e) => setNewInitialStatus(e.target.value)}
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    >
+                      <option value="NEW">New Inquiry (Uncontacted)</option>
+                      <option value="CONTACTED">In Consultation</option>
+                      <option value="VISIT_SCHEDULED">Site Visit / Tasting Booked</option>
+                      <option value="PROPOSAL_SENT">Proposal Quote Sent</option>
+                      <option value="BOOKED">Confirmed Event (Advance Paid)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                      Assign Lead Partner / Coordinator
+                    </label>
+                    <select
+                      value={newAssignedUser}
+                      onChange={(e) => setNewAssignedUser(e.target.value)}
+                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
+                    >
+                      <option value="">Unassigned</option>
+                      {partners.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.fullName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                    Internal Notes &amp; Special Instructions
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={newNotes}
+                    onChange={(e) => setNewNotes(e.target.value)}
+                    placeholder="Specific requests, dietary restrictions, flower preferences, power loads..."
+                    className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2 text-sm text-brand-cream focus:border-brand-gold outline-none resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
+                <button
+                  type="button"
+                  onClick={() => setAddBookingModalOpen(false)}
+                  className="py-2 px-4 rounded-xl text-xs text-brand-muted hover:text-brand-cream"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="py-3 px-6 rounded-xl bg-brand-gold text-brand-dark text-xs sm:text-sm font-bold hover:bg-brand-goldHover transition-all shadow-md shadow-brand-gold/15 active:scale-95 disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Creating Booking...' : '+ Save &amp; Inject into Pipeline'}
+                </button>
+              </div>
+
             </form>
           </div>
         </div>

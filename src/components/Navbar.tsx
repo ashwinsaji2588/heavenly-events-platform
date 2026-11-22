@@ -1,56 +1,71 @@
 'use client';
 
 import Link from 'next/link';
-import { Phone } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-brand-dark/85 border-b border-white/5">
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-brand-dark/90 border-b border-white/5 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        
+        {/* Brand Wordmark */}
         <Link href="/" className="flex items-center gap-3 group">
-          <span className="w-8 h-8 rounded-full bg-brand-gold/10 text-brand-gold flex items-center justify-center font-serif text-lg group-hover:scale-105 transition-transform">
+          <span className="w-9 h-9 rounded-xl bg-brand-gold/15 text-brand-gold flex items-center justify-center font-serif text-lg font-bold border border-brand-gold/30 group-hover:scale-105 transition-transform shadow-md shadow-brand-gold/5">
             ✦
           </span>
-          <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-brand-cream">
-            Heavenly Events
-          </span>
-          <span className="hidden sm:inline-block text-[11px] uppercase tracking-widest text-brand-muted pl-2 border-l border-white/10">
-            Punalur, Kerala
-          </span>
+          <div className="flex flex-col">
+            <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-brand-cream">
+              Occasion Desk
+            </span>
+            <span className="text-[10px] tracking-widest uppercase text-brand-gold font-medium">
+              Event Industry OS
+            </span>
+          </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm text-brand-muted">
-          <Link href="/weddings" className="hover:text-brand-cream transition-colors">
-            Weddings
-          </Link>
-          <Link href="/receptions" className="hover:text-brand-cream transition-colors">
-            Receptions
-          </Link>
-          <Link href="/mini-events" className="hover:text-brand-cream transition-colors">
-            Mini Events
-          </Link>
-          <Link href="/desk" className="text-brand-gold/90 hover:text-brand-gold font-medium flex items-center gap-1 transition-colors">
-            Occasion Desk ↗
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-wider text-brand-muted">
+          <a href="#industries" className="hover:text-brand-cream transition-colors">
+            Who It&apos;s For
+          </a>
+          <a href="#features" className="hover:text-brand-cream transition-colors">
+            Features
+          </a>
+          <a href="#workflows" className="hover:text-brand-cream transition-colors">
+            Workflows
+          </a>
+          <a href="#pricing" className="hover:text-brand-cream transition-colors">
+            Pricing
+          </a>
+          <Link href="/desk" className="text-brand-gold hover:text-brand-goldHover transition-colors flex items-center gap-1">
+            Live Workspace ↗
           </Link>
         </nav>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden lg:flex items-center gap-3 text-xs font-semibold text-brand-gold">
-            <a href="tel:+919074624023" className="hover:text-brand-cream transition-colors flex items-center gap-1">
-              <Phone className="w-3 h-3" /> +91 90746 24023
-            </a>
-            <span className="text-white/20">|</span>
-            <a href="tel:+918921744145" className="hover:text-brand-cream transition-colors flex items-center gap-1">
-              <Phone className="w-3 h-3" /> +91 89217 44145
-            </a>
-          </div>
+        {/* Right CTA Cluster */}
+        <div className="flex items-center gap-3">
+          {/* Light / Dark Mode Switcher */}
+          <ThemeToggle />
+
+          {/* Unified Partner Login */}
           <Link
-            href="/#inquiry"
-            className="py-2.5 px-5 rounded-full bg-brand-gold text-brand-dark text-xs sm:text-sm font-semibold hover:bg-brand-goldHover transition-all shadow-md shadow-brand-gold/10"
+            href="/login"
+            className="py-2.5 px-4 rounded-xl bg-brand-surface border border-white/10 text-xs sm:text-sm font-medium text-brand-cream hover:bg-brand-charcoal transition-all hidden sm:inline-flex items-center gap-1.5"
           >
-            Get a Quote
+            Sign In
+          </Link>
+
+          {/* Primary Onboarding CTA */}
+          <Link
+            href="/onboard"
+            className="py-2.5 px-5 rounded-xl bg-brand-gold text-brand-dark text-xs sm:text-sm font-semibold hover:bg-brand-goldHover transition-all shadow-lg shadow-brand-gold/20 flex items-center gap-1.5 active:scale-95"
+          >
+            <span>Onboard Business</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
+
       </div>
     </header>
   );

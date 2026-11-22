@@ -11,6 +11,89 @@ html {
   scroll-behavior: smooth;
   background-color: #141813;
   color: #f4f1ea;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Light Theme Mappings */
+html.light {
+  background-color: #faf8f5;
+  color: #1a201b;
+}
+
+html.light body {
+  background-color: #faf8f5;
+  color: #1a201b;
+}
+
+html.light .bg-brand-dark {
+  background-color: #faf8f5 !important;
+}
+
+html.light .bg-brand-deep,
+html.light .bg-brand-deep\/40,
+html.light .bg-brand-deep\/50,
+html.light .bg-brand-deep\/60,
+html.light .bg-brand-deep\/80 {
+  background-color: #f3efe8 !important;
+}
+
+html.light .bg-brand-charcoal,
+html.light .bg-brand-charcoal\/40,
+html.light .bg-brand-charcoal\/50,
+html.light .bg-brand-charcoal\/60,
+html.light .bg-brand-charcoal\/70,
+html.light .bg-brand-charcoal\/80,
+html.light .bg-brand-charcoal\/90 {
+  background-color: #ffffff !important;
+  color: #1a201b !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+html.light .bg-brand-surface,
+html.light .bg-brand-surface\/70,
+html.light .bg-brand-surface\/90 {
+  background-color: #f7f4ee !important;
+  color: #1a201b !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+}
+
+html.light .text-brand-cream,
+html.light .text-brand-cream\/90,
+html.light .text-brand-cream\/80 {
+  color: #1a201b !important;
+}
+
+html.light .text-brand-muted,
+html.light .text-brand-muted\/80 {
+  color: #64748b !important;
+}
+
+html.light .border-white\/5,
+html.light .border-white\/10,
+html.light .border-white\/15,
+html.light .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.09) !important;
+}
+
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #1a201b !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #faf8f5;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #c5a880;
 }
 
 body {

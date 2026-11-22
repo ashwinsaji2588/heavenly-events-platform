@@ -6,6 +6,7 @@ export async function POST(req: Request) {
   try {
     const {
       firmName,
+      businessCategory,
       city,
       phone,
       adminName,
@@ -57,6 +58,27 @@ export async function POST(req: Request) {
 
     // Atomic creation of Organization + Admin User
     const passwordHash = hashPassword(adminPassword);
+    const category = businessCategory || 'EVENT_MANAGEMENT';
+
+    // Tailored sample data based on chosen industry
+    let sampleOccasion = 'Luxury Wedding & Reception';
+    let sampleNotes = 'Sample wedding inquiry. You can update or drag this card across your pipeline.';
+    let sampleBudget = '₹10,00,000 - ₹25,00,000';
+    let sampleGuestCount = 650;
+
+    if (category === 'CATERING_AND_BANQUET') {
+      sampleOccasion = 'Grand Banquet Feast & Live Counters';
+      sampleNotes = 'Headcount: 650 plates (250 Traditional Veg Sadhya / 400 Non-Veg Dinner Buffet). Tasting booked for tomorrow.';
+      sampleBudget = '₹5,00,000 - ₹8,50,000';
+    } else if (category === 'STAGE_DECOR') {
+      sampleOccasion = 'Lotus Mandap & Floral Ceiling Architecture';
+      sampleNotes = 'Stage Dimensions: 40ft width, 16ft ceiling height. Color palette: Champagne Gold and Ivory Orchids.';
+      sampleBudget = '₹3,50,000 - ₹6,00,000';
+    } else if (category === 'LIGHT_AND_SOUND') {
+      sampleOccasion = 'Gala Sangeet Stage Trussing & AV';
+      sampleNotes = '12 Moving beam heads, digital LED wall matrix, 25kW generator requirement, and wireless microphones.';
+      sampleBudget = '₹2,50,000 - ₹4,50,000';
+    }
 
     const result = await prisma.$transaction(async (tx) => {
       const organization = await tx.organization.create({
@@ -69,6 +91,7 @@ export async function POST(req: Request) {
             city: city?.trim() || 'Kerala, India',
             defaultCurrency: 'INR',
             timezone: 'Asia/Kolkata',
+            businessCategory: category,
           },
         },
       });
@@ -84,19 +107,20 @@ export async function POST(req: Request) {
         },
       });
 
-      // Create an initial Welcome Lead to demonstrate the pipeline
+      // Create tailored sample lead
       await tx.lead.create({
         data: {
           orgId: organization.id,
-          clientName: 'Welcome Inquirer (Sample)',
+          clientName: 'Welcome Client (Sample)',
           clientPhone: '+91 90000 00000',
           clientEmail: 'client@example.com',
-          occasionType: 'Luxury Wedding & Reception',
+          occasionType: sampleOccasion,
+          venueName: 'The River Palace Auditorium',
           venueCity: city?.trim() || 'Kerala',
-          budgetRange: '₹10,00,000 - ₹25,00,000',
-          guestCount: 500,
+          budgetRange: sampleBudget,
+          guestCount: sampleGuestCount,
           status: 'NEW',
-          notes: 'System generated sample lead. You can drag or update its status to test your pipeline.',
+          notes: sampleNotes,
           assignedUserId: superAdmin.id,
         },
       });
@@ -112,6 +136,7 @@ export async function POST(req: Request) {
           changes: {
             name: organization.name,
             slug: organization.slug,
+            businessCategory: category,
             admin: superAdmin.email,
           },
         },
@@ -120,38 +145,50 @@ export async function POST(req: Request) {
       return { organization, superAdmin };
     });
 
-    // Create session token
-    const sessionUser = {
-      id: result.superAdmin.id,
-      email: result.superAdmin.email,
-      fullName: result.superAdmin.fullName,
-      role: result.superAdmin.role,
+    // Generate JWT session token
+    const token = signToken({
+      userId: result.superAdmin.id,
       orgId: result.organization.id,
-    };
-
-    const token = signToken(sessionUser);
-
-    const response = NextResponse.json({
-      success: true,
-      message: 'Firm successfully onboarded!',
-      organization: result.organization,
-      user: sessionUser,
+      role: result.superAdmin.role,
+      email: result.superAdmin.email,
     });
 
     const isHttps = process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false;
 
-    // Set HTTP-only session cookie
-    response.cookies.set('heavenly_session', token, {
+    const response = NextResponse.json(
+      {
+        success: true,
+        organization: {
+          id: result.organization.id,
+          name: result.organization.name,
+          slug: result.organization.slug,
+        },
+        user: {
+          id: result.superAdmin.id,
+          email: result.superAdmin.email,
+          fullName: result.superAdmin.fullName,
+          role: result.superAdmin.role,
+        },
+      },
+      { status: 201 }
+    );
+
+    response.cookies.set({
+      name: 'auth_token',
+      value: token,
       httpOnly: true,
       secure: isHttps,
       sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return response;
-  } catch (error) {
-    console.error('Firm onboarding error:', error);
-    return NextResponse.json({ error: 'Failed to complete firm onboarding' }, { status: 500 });
+  } catch (error: unknown) {
+    console.error('Onboarding Error:', error);
+    return NextResponse.json(
+      { error: 'Failed to onboard firm. Please check parameters and try again.' },
+      { status: 500 }
+    );
   }
 }

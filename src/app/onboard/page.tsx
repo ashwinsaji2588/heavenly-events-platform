@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Building2, User, Mail, Phone, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
+import { Building2, User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
 
 export default function OnboardPage() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function OnboardPage() {
 
   // Form State
   const [firmName, setFirmName] = useState('');
+  const [businessCategory, setBusinessCategory] = useState('EVENT_MANAGEMENT');
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('+91 ');
   const [adminName, setAdminName] = useState('');
@@ -29,6 +31,7 @@ export default function OnboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           firmName,
+          businessCategory,
           city,
           phone,
           adminName,
@@ -55,27 +58,33 @@ export default function OnboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-dark text-brand-cream selection:bg-brand-gold selection:text-brand-dark flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen bg-brand-dark text-brand-cream selection:bg-brand-gold selection:text-brand-dark flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12 transition-colors relative">
+      
+      {/* Top Bar Switcher */}
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="max-w-xl w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-4 group">
-            <span className="w-10 h-10 rounded-full bg-brand-gold/10 text-brand-gold flex items-center justify-center font-serif text-xl group-hover:scale-105 transition-transform">
+            <span className="w-10 h-10 rounded-full bg-brand-gold/15 text-brand-gold flex items-center justify-center font-serif text-xl group-hover:scale-105 transition-transform border border-brand-gold/30">
               ✦
             </span>
           </Link>
           <div className="text-xs uppercase tracking-widest text-brand-gold font-semibold flex items-center justify-center gap-1.5 mb-2">
             <ShieldCheck className="w-4 h-4" />
-            Agency SaaS Setup
+            Occasion Desk SaaS Onboarding
           </div>
-          <h1 className="text-3xl sm:text-4xl font-serif text-brand-cream">
-            Onboard Your Event Firm
+          <h1 className="text-3xl sm:text-4xl font-serif text-brand-cream font-medium">
+            Onboard Your Business
           </h1>
-          <p className="text-xs sm:text-sm text-brand-muted mt-2 max-w-md mx-auto">
-            Provision your agency tenant, instantiate your Occasion Desk CRM, and configure master partner credentials.
+          <p className="text-xs sm:text-sm text-brand-muted mt-2 max-w-md mx-auto leading-relaxed">
+            Provision your dedicated workspace in 60 seconds. Designed for event planners, catering companies, stage décor studios, and AV crews.
           </p>
         </div>
 
-        <div className="bg-brand-charcoal/80 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
+        <div className="bg-brand-charcoal border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
           {error && (
             <div className="p-4 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 text-xs">
               {error}
@@ -83,43 +92,61 @@ export default function OnboardPage() {
           )}
 
           <form onSubmit={handleOnboard} className="space-y-6">
+            
             {/* Firm Details Section */}
             <div className="space-y-4">
               <div className="text-xs uppercase tracking-wider text-brand-gold font-semibold flex items-center gap-2 pb-1 border-b border-white/5">
                 <Building2 className="w-4 h-4" />
-                1. Firm Information
+                1. Business Profile
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1">
-                  Event Firm / Agency Name *
+                <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                  Business / Agency Name *
                 </label>
                 <input
                   type="text"
                   required
                   value={firmName}
                   onChange={(e) => setFirmName(e.target.value)}
-                  placeholder="e.g. Heavenly Events"
+                  placeholder="e.g. Royal Banquet &amp; Events"
                   className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
                 />
               </div>
 
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium flex items-center gap-1">
+                  <Tag className="w-3.5 h-3.5 text-brand-gold" /> Primary Industry Category *
+                </label>
+                <select
+                  value={businessCategory}
+                  onChange={(e) => setBusinessCategory(e.target.value)}
+                  className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
+                >
+                  <option value="EVENT_MANAGEMENT">🎪 Event Management &amp; Wedding Planning</option>
+                  <option value="CATERING_AND_BANQUET">🍽️ Catering &amp; Banquet Halls</option>
+                  <option value="STAGE_DECOR">🌸 Stage Architecture &amp; Floral Décor</option>
+                  <option value="LIGHT_AND_SOUND">💡 Sound, Lighting &amp; AV Production</option>
+                  <option value="FULL_SERVICE_PRODUCTION">✦ Full-Service Event Production (Décor + Food + AV)</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1">
-                    City / Headquarters *
+                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                    City / Operating Region *
                   </label>
                   <input
                     type="text"
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    placeholder="e.g. Punalur, Kerala"
+                    placeholder="e.g. Kollam, Kerala"
                     className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 flex items-center gap-1">
+                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium flex items-center gap-1">
                     <Phone className="w-3 h-3 text-brand-gold" /> Official WhatsApp / Phone *
                   </label>
                   <input
@@ -138,80 +165,80 @@ export default function OnboardPage() {
             <div className="space-y-4 pt-2">
               <div className="text-xs uppercase tracking-wider text-brand-gold font-semibold flex items-center gap-2 pb-1 border-b border-white/5">
                 <User className="w-4 h-4" />
-                2. Master Admin / Founder Login
-              </div>
-
-              <div>
-                <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1">
-                  Founder / Partner Full Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={adminName}
-                  onChange={(e) => setAdminName(e.target.value)}
-                  placeholder="e.g. Jomit"
-                  className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
-                />
+                2. Master Admin Account
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 flex items-center gap-1">
-                    <Mail className="w-3 h-3 text-brand-gold" /> Official Admin Email *
+                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium">
+                    Admin Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={adminName}
+                    onChange={(e) => setAdminName(e.target.value)}
+                    placeholder="e.g. Jomit Saji"
+                    className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium flex items-center gap-1">
+                    <Mail className="w-3 h-3 text-brand-gold" /> Official Sign-In Email *
                   </label>
                   <input
                     type="email"
                     required
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
-                    placeholder="jomit@heavenlyevents.in"
+                    placeholder="admin@yourfirm.in"
                     className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
                   />
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-brand-gold" /> Master Password *
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    minLength={8}
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder="Min 8 characters"
-                    className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-brand-gold" /> Master Password (Min 8 Characters) *
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors font-mono"
+                />
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-6 rounded-xl bg-brand-gold text-brand-dark font-semibold text-sm hover:bg-brand-goldHover transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-gold/15 disabled:opacity-50"
+              className="w-full py-4 rounded-xl bg-brand-gold text-brand-dark font-bold text-sm sm:text-base hover:bg-brand-goldHover transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-gold/20 active:scale-98 disabled:opacity-50 mt-6"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-brand-dark border-t-transparent rounded-full animate-spin" />
+                <span>Provisioning Workspace...</span>
               ) : (
                 <>
-                  Register Agency & Launch Desk
+                  <span>Create Workspace &amp; Launch Occasion Desk</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
+
+          <div className="pt-4 text-center border-t border-white/5">
+            <span className="text-xs text-brand-muted">Already registered your business? </span>
+            <Link href="/login" className="text-xs text-brand-gold font-semibold hover:underline">
+              Partner Sign In &rarr;
+            </Link>
+          </div>
         </div>
 
-        <div className="text-center flex items-center justify-center gap-4 text-xs text-brand-muted">
-          <Link href="/login" className="hover:text-brand-cream transition-colors">
-            Already have a login? Sign in here →
-          </Link>
-          <span>•</span>
-          <Link href="/" className="hover:text-brand-cream transition-colors">
-            Return to Portfolio
-          </Link>
+        <div className="text-center text-xs text-brand-muted">
+          &copy; {new Date().getFullYear()} Occasion Desk. Multi-Tenant SaaS on Oracle Cloud Always Free.
         </div>
       </div>
     </div>
