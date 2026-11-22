@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
-import { Building2, User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
+import { Building2, User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Tag, Eye, EyeOff } from 'lucide-react';
 
 export default function OnboardPage() {
   const router = useRouter();
@@ -15,10 +15,11 @@ export default function OnboardPage() {
   const [firmName, setFirmName] = useState('');
   const [businessCategory, setBusinessCategory] = useState('EVENT_MANAGEMENT');
   const [city, setCity] = useState('');
-  const [phone, setPhone] = useState('+91 ');
+  const [phone, setPhone] = useState('+91 9188444859');
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleOnboard(e: React.FormEvent) {
     e.preventDefault();
@@ -201,15 +202,25 @@ export default function OnboardPage() {
                 <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium flex items-center gap-1">
                   <Lock className="w-3 h-3 text-brand-gold" /> Master Password (Min 8 Characters) *
                 </label>
-                <input
-                  type="password"
-                  required
-                  minLength={8}
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors font-mono"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full bg-brand-dark/90 border border-white/10 rounded-xl pl-4 pr-11 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-gold transition-colors p-1"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
 

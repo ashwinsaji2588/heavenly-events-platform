@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, Mail, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, Sparkles, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -89,17 +90,35 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs uppercase tracking-wider text-brand-muted mb-2 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-brand-gold" /> Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
-              />
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs uppercase tracking-wider text-brand-muted flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-brand-gold" /> Password
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-brand-gold hover:underline font-medium"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full bg-brand-dark/90 border border-white/10 rounded-xl pl-4 pr-11 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-gold transition-colors p-1"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button

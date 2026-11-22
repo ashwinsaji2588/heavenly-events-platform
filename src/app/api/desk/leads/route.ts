@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { sanitizeString, sanitizeEmail, sanitizePhone, sanitizeNumber } from '@/lib/sanitize';
+import { sanitizeString, sanitizeEmail, sanitizePhone, sanitizeNumber, isValidUUID } from '@/lib/sanitize';
 
 // 1. Fetch leads for current organization with filtering & search
 export async function GET(req: Request) {
@@ -181,3 +181,57 @@ export async function POST(req: Request) {
     );
   }
 }
+
+// 3. Delete Lead/Event Booking with Audit Record
+export async function DELETE(req: Request) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id || !isValidUUID(id)) {
+      return NextResponse.json({ error: 'Valid event booking ID is required.' }, { status: 400 });
+    }
+
+    // Verify lead exists and belongs to the authenticated user's organization
+    const lead = await prisma.lead.findUnique({
+      where: { id },
+      select: { id: true, orgId: true, clientName: true, occasionType: true },
+    });
+
+    if (!lead || lead.orgId !== user.orgId) {
+      return NextResponse.json({ error: 'Event booking not found or permission denied.' }, { status: 404 });
+    }
+
+    // Cascade delete in Prisma schema: siteVisits, proposals, payments will cascade delete
+    await prisma.lead.delete({
+      where: { id },
+    });
+
+    // Record audit log
+    await prisma.auditLog.create({
+      data: {
+        orgId: user.orgId,
+        userId: user.id,
+        entityName: 'Lead',
+        entityId: id,
+        action: 'LEAD_PERMANENTLY_DELETED',
+        changes: {
+          clientName: lead.clientName,
+          occasionType: lead.occasionType,
+          deletedBy: user.email,
+        },
+      },
+    });
+
+    return NextResponse.json({ success: true, message: 'Event booking permanently deleted.' });
+  } catch (error) {
+    console.error('Delete booking error:', error);
+    return NextResponse.json({ error: 'Failed to delete event booking.' }, { status: 500 });
+  }
+}
+

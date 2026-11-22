@@ -31,6 +31,9 @@ import {
   Zap,
   ChevronRight,
   Check,
+  Eye,
+  EyeOff,
+  AlertTriangle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -208,6 +211,17 @@ export default function DeskDashboard({
   const [newMemberRole, setNewMemberRole] = useState('PLANNER');
   const [newMemberPassword, setNewMemberPassword] = useState('Desk@2026!');
   const [createdMemberResult, setCreatedMemberResult] = useState<{ user: TeamMember; whatsappCredentialsUrl: string | null } | null>(null);
+
+  // Password Visibility States
+  const [showNewMemberPassword, setShowNewMemberPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Delete Lead / Event Booking State
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
+  const [isDeletingLead, setIsDeletingLead] = useState(false);
+  const [deleteLeadError, setDeleteLeadError] = useState<string | null>(null);
 
   // Password Change State
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -491,6 +505,33 @@ export default function DeskDashboard({
       }
     } finally {
       setIsChangingPassword(false);
+    }
+  }
+
+  async function handleDeleteBooking(leadId: string) {
+    if (!leadId) return;
+    setIsDeletingLead(true);
+    setDeleteLeadError(null);
+    try {
+      const res = await fetch(`/api/desk/leads?id=${encodeURIComponent(leadId)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete event booking');
+      }
+
+      // Remove from local leads state
+      setLeads((prev) => prev.filter((l) => l.id !== leadId));
+      setLeadToDelete(null);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setDeleteLeadError(err.message);
+      } else {
+        setDeleteLeadError('An unexpected error occurred while deleting the booking.');
+      }
+    } finally {
+      setIsDeletingLead(false);
     }
   }
 
@@ -826,9 +867,23 @@ export default function DeskDashboard({
                               <h4 className="text-base font-serif font-medium text-brand-cream">
                                 {lead.clientName}
                               </h4>
-                              <span className="text-[10px] text-brand-muted">
-                                {new Date(lead.createdAt).toLocaleDateString()}
-                              </span>
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                <span className="text-[10px] text-brand-muted">
+                                  {new Date(lead.createdAt).toLocaleDateString()}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setDeleteLeadError(null);
+                                    setLeadToDelete(lead);
+                                  }}
+                                  className="w-6 h-6 rounded-md text-brand-muted/70 hover:text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center active:scale-90"
+                                  title="Delete Event Booking"
+                                  aria-label={`Delete event booking for ${lead.clientName}`}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
                             <div className="text-xs text-brand-gold font-medium mt-0.5">
                               {lead.occasionType}
@@ -965,6 +1020,19 @@ export default function DeskDashboard({
                                 title="Draft Official Proposal Quote"
                               >
                                 <FileText className="w-3.5 h-3.5" />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setDeleteLeadError(null);
+                                  setLeadToDelete(lead);
+                                }}
+                                className="w-8 h-8 rounded-lg bg-brand-surface text-brand-muted hover:bg-red-950/60 hover:text-red-400 hover:border-red-500/30 border border-transparent transition-colors flex items-center justify-center text-xs active:scale-95"
+                                title="Delete Event Booking"
+                                aria-label={`Delete event booking for ${lead.clientName}`}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </div>
@@ -1845,13 +1913,24 @@ export default function DeskDashboard({
                         Auto-generate
                       </button>
                     </div>
-                    <input
-                      type="text"
-                      required
-                      value={newMemberPassword}
-                      onChange={(e) => setNewMemberPassword(e.target.value)}
-                      className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm font-mono text-brand-cream focus:border-brand-gold outline-none"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showNewMemberPassword ? "text" : "password"}
+                        required
+                        value={newMemberPassword}
+                        onChange={(e) => setNewMemberPassword(e.target.value)}
+                        className="w-full bg-brand-dark border border-white/10 rounded-xl pl-4 pr-11 py-2.5 text-sm font-mono text-brand-cream focus:border-brand-gold outline-none transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewMemberPassword(!showNewMemberPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-cream transition-colors p-1"
+                        title={showNewMemberPassword ? "Hide password" : "Show password"}
+                        aria-label={showNewMemberPassword ? "Hide password" : "Show password"}
+                      >
+                        {showNewMemberPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1919,44 +1998,77 @@ export default function DeskDashboard({
                 <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1">
                   Current Password *
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
-                />
+                <div className="relative">
+                  <input
+                    type={showCurrentPassword ? "text" : "password"}
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full bg-brand-dark border border-white/10 rounded-xl pl-4 pr-11 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-cream transition-colors p-1"
+                    title={showCurrentPassword ? "Hide password" : "Show password"}
+                    aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                  >
+                    {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1">
                   New Password *
                 </label>
-                <input
-                  type="password"
-                  required
-                  minLength={8}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Min 8 characters"
-                  className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    required
+                    minLength={8}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Min 8 characters"
+                    className="w-full bg-brand-dark border border-white/10 rounded-xl pl-4 pr-11 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-cream transition-colors p-1"
+                    title={showNewPassword ? "Hide password" : "Show password"}
+                    aria-label={showNewPassword ? "Hide password" : "Show password"}
+                  >
+                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1">
                   Confirm New Password *
                 </label>
-                <input
-                  type="password"
-                  required
-                  minLength={8}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter new password"
-                  className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    required
+                    minLength={8}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter new password"
+                    className="w-full bg-brand-dark border border-white/10 rounded-xl pl-4 pr-11 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-cream transition-colors p-1"
+                    title={showConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/5">
@@ -2515,6 +2627,97 @@ export default function DeskDashboard({
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Delete Event Confirmation Modal */}
+      {leadToDelete && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-brand-charcoal border border-red-500/30 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-medium text-brand-cream leading-snug">
+                  Delete Event Booking?
+                </h3>
+                <p className="text-xs text-red-400/90 font-medium">
+                  This destructive action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            {/* Event Summary Details */}
+            <div className="p-3.5 rounded-xl bg-brand-surface/70 border border-white/5 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-brand-muted">Client:</span>
+                <span className="font-medium text-brand-cream">{leadToDelete.clientName}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-brand-muted">Occasion:</span>
+                <span className="font-medium text-brand-gold">{leadToDelete.occasionType}</span>
+              </div>
+              {leadToDelete.targetDate && (
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-brand-muted">Event Date:</span>
+                  <span className="font-medium text-brand-cream">
+                    {new Date(leadToDelete.targetDate).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-brand-muted">Current Stage:</span>
+                <span className="font-mono text-[11px] text-amber-300">
+                  {leadToDelete.status.replace(/_/g, ' ')}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs text-brand-muted leading-relaxed">
+              Deleting this booking will permanently erase the event record along with all associated timeline visits, client proposals, and logged payments from the database.
+            </p>
+
+            {deleteLeadError && (
+              <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/30 text-xs text-red-300">
+                {deleteLeadError}
+              </div>
+            )}
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-white/10">
+              <button
+                type="button"
+                disabled={isDeletingLead}
+                onClick={() => {
+                  setLeadToDelete(null);
+                  setDeleteLeadError(null);
+                }}
+                className="py-2.5 px-4 rounded-xl text-xs font-medium text-brand-muted hover:text-brand-cream hover:bg-brand-surface transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingLead}
+                onClick={() => handleDeleteBooking(leadToDelete.id)}
+                className="py-2.5 px-5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-all shadow-lg shadow-red-600/20 disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
+              >
+                {isDeletingLead ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Permanently</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
