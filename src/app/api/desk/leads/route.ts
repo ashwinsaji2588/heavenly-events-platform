@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { sanitizeString, sanitizeEmail, sanitizePhone, sanitizeNumber } from '@/lib/sanitize';
 
 // 1. Fetch leads for current organization with filtering & search
 export async function GET(req: Request) {
@@ -27,12 +28,13 @@ export async function GET(req: Request) {
       whereClause.assignedUserId = assignedUserId;
     }
 
-    if (search?.trim()) {
+    const cleanSearch = search ? sanitizeString(search, 100) : '';
+    if (cleanSearch) {
       whereClause.OR = [
-        { clientName: { contains: search.trim(), mode: 'insensitive' } },
-        { clientPhone: { contains: search.trim(), mode: 'insensitive' } },
-        { venueName: { contains: search.trim(), mode: 'insensitive' } },
-        { occasionType: { contains: search.trim(), mode: 'insensitive' } },
+        { clientName: { contains: cleanSearch, mode: 'insensitive' } },
+        { clientPhone: { contains: cleanSearch, mode: 'insensitive' } },
+        { venueName: { contains: cleanSearch, mode: 'insensitive' } },
+        { occasionType: { contains: cleanSearch, mode: 'insensitive' } },
       ];
     }
 
@@ -101,9 +103,13 @@ export async function POST(req: Request) {
     const validStatuses = ['NEW', 'CONTACTED', 'VISIT_SCHEDULED', 'PROPOSAL_SENT', 'BOOKED', 'ARCHIVED', 'LOST'];
     const safeStatus = validStatuses.includes(status) ? (status as any) : 'NEW';
 
-    if (!clientName?.trim() || !clientPhone?.trim() || !occasionType?.trim()) {
+    const cleanClientName = sanitizeString(clientName, 120);
+    const cleanClientPhone = sanitizePhone(clientPhone);
+    const cleanOccasionType = sanitizeString(occasionType, 120);
+
+    if (!cleanClientName || !cleanClientPhone || !cleanOccasionType) {
       return NextResponse.json(
-        { error: 'Client name, client phone number, and occasion type are required.' },
+        { error: 'Valid client name, client phone number, and occasion type are required.' },
         { status: 400 }
       );
     }
@@ -111,16 +117,16 @@ export async function POST(req: Request) {
     const newLead = await prisma.lead.create({
       data: {
         orgId: user.orgId,
-        clientName: clientName.trim(),
-        clientPhone: clientPhone.trim(),
-        clientEmail: clientEmail?.trim() || null,
-        occasionType: occasionType.trim(),
+        clientName: cleanClientName,
+        clientPhone: cleanClientPhone,
+        clientEmail: clientEmail ? sanitizeEmail(clientEmail) : null,
+        occasionType: cleanOccasionType,
         targetDate: targetDate ? new Date(targetDate) : null,
-        venueName: venueName?.trim() || null,
-        venueCity: venueCity?.trim() || null,
-        guestCount: guestCount ? parseInt(String(guestCount), 10) : null,
-        budgetRange: budgetRange?.trim() || null,
-        notes: notes?.trim() || null,
+        venueName: venueName ? sanitizeString(venueName, 150) : null,
+        venueCity: venueCity ? sanitizeString(venueCity, 100) : null,
+        guestCount: guestCount ? sanitizeNumber(guestCount, 1, 100_000) : null,
+        budgetRange: budgetRange ? sanitizeString(budgetRange, 60) : null,
+        notes: notes ? sanitizeString(notes, 4000) : null,
         status: safeStatus,
         assignedUserId: assignedUserId || user.id,
         metadata: {

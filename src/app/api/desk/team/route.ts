@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser, hashPassword } from '@/lib/auth';
+import { sanitizeString, sanitizeEmail, sanitizePhone } from '@/lib/sanitize';
 
 // 1. Fetch all team members for current organization
 export async function GET() {
@@ -43,13 +44,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Forbidden: Insufficient privileges to invite users' }, { status: 403 });
     }
 
-    const { fullName, email, phone, role = 'PLANNER', password } = await req.json();
+    const body = await req.json();
+    const { fullName, email, phone, role = 'PLANNER', password } = body;
 
-    if (!fullName?.trim() || !email?.trim() || !password?.trim()) {
-      return NextResponse.json({ error: 'Full name, email, and password are required' }, { status: 400 });
+    const cleanFullName = sanitizeString(fullName, 100);
+    const cleanEmail = sanitizeEmail(email);
+    const cleanPhone = phone ? sanitizePhone(phone) : null;
+
+    if (!cleanFullName || !cleanEmail || !password?.trim()) {
+      return NextResponse.json({ error: 'Valid full name, official email, and password are required' }, { status: 400 });
     }
 
-    const cleanEmail = email.toLowerCase().trim();
+    if (password.length < 8) {
+      return NextResponse.json({ error: 'Password must be at least 8 characters long' }, { status: 400 });
+    }
+
+    const safeRole = (role === 'PARTNER' || role === 'SUPER_ADMIN') && user.role === 'SUPER_ADMIN' ? role : 'PLANNER';
 
     // Check if email already exists
     const existing = await prisma.user.findUnique({
@@ -67,10 +77,10 @@ export async function POST(req: Request) {
     const newUser = await prisma.user.create({
       data: {
         orgId: user.orgId,
-        fullName: fullName.trim(),
+        fullName: cleanFullName,
         email: cleanEmail,
-        phone: phone?.trim() || null,
-        role,
+        phone: cleanPhone,
+        role: safeRole,
         passwordHash,
       },
       select: {

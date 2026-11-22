@@ -26,6 +26,8 @@ import {
   Key,
   Utensils,
   Tag,
+  Kanban,
+  Send,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -502,51 +504,84 @@ export default function DeskDashboard({
   return (
     <div className="min-h-screen bg-brand-dark text-brand-cream pb-24">
       {/* Top Bar */}
-      <header className="sticky top-0 z-40 bg-brand-charcoal/90 backdrop-blur-xl border-b border-white/5 transition-colors">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[4rem] py-2.5 sm:py-0 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <Link href="/" className="font-serif text-base sm:text-lg text-brand-cream hover:text-brand-gold transition-colors flex items-center gap-1.5 min-w-0">
-              <span className="text-brand-gold flex-shrink-0">✦</span>
-              <span className="font-bold truncate max-w-[130px] xs:max-w-[170px] sm:max-w-xs">{organization?.name || 'Occasion Desk'}</span>
+      <header className="sticky top-0 z-40 bg-brand-charcoal/95 backdrop-blur-xl border-b border-white/10 transition-colors shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+          {/* Brand & Organization Title */}
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href="/" className="flex items-center gap-2.5 group min-w-0" title="Occasion Desk">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold font-serif text-base font-bold shadow-sm group-hover:scale-105 transition-transform flex-shrink-0">
+                ✦
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="font-serif font-bold text-base sm:text-lg text-brand-cream group-hover:text-brand-gold transition-colors leading-tight tracking-tight truncate">
+                  Occasion Desk
+                </span>
+                <span className="text-[10px] sm:text-[11px] text-brand-gold font-medium leading-none truncate flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+                  <span className="truncate max-w-[130px] xs:max-w-[170px] sm:max-w-[240px] text-brand-muted hover:text-brand-cream">
+                    {organization?.name || 'Workspace'}
+                  </span>
+                </span>
+              </div>
             </Link>
-            <span className="hidden md:inline-flex text-[11px] px-2.5 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold font-medium border border-brand-gold/20 whitespace-nowrap flex-shrink-0">
-              Occasion Desk CRM
-            </span>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {/* Theme Switcher */}
-            <ThemeToggle />
-
-            {/* + Add Booking Primary Button */}
+          {/* Desktop & Mobile Actions */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {/* Desktop + Add Booking Button */}
             <button
               onClick={() => {
                 setBookingError(null);
                 setAddBookingModalOpen(true);
               }}
-              className="py-1.5 px-2.5 sm:px-3.5 rounded-xl bg-brand-gold text-brand-dark font-bold text-xs hover:bg-brand-goldHover transition-all flex items-center gap-1 shadow-md shadow-brand-gold/15 active:scale-95 whitespace-nowrap"
+              className="hidden sm:inline-flex h-9 px-3.5 rounded-xl bg-brand-gold text-brand-dark font-bold text-xs hover:bg-brand-goldHover transition-all items-center gap-1.5 shadow-md shadow-brand-gold/15 active:scale-95 whitespace-nowrap"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>+ Booking</span>
+              <Plus className="w-4 h-4" />
+              <span>+ Add Booking</span>
             </button>
 
+            {/* Desktop + Enroll Partner Button */}
+            <button
+              onClick={() => {
+                setCreatedMemberResult(null);
+                setNewMemberName('');
+                setNewMemberEmail('');
+                setNewMemberPhone('+91 ');
+                setNewMemberRole('PLANNER');
+                setNewMemberPassword('Partner@2026!');
+                setTeamModalOpen(true);
+              }}
+              className="hidden lg:inline-flex h-9 px-3 rounded-xl bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/10 font-medium text-xs transition-colors items-center gap-1.5 whitespace-nowrap"
+            >
+              <Users className="w-3.5 h-3.5 text-brand-gold" />
+              <span>+ Partner</span>
+            </button>
+
+            {/* Theme Toggle Button */}
+            <div className="flex-shrink-0">
+              <ThemeToggle />
+            </div>
+
+            {/* User Session Controls */}
             {currentUser && (
-              <div className="flex items-center gap-1.5 pl-1.5 sm:pl-2 border-l border-white/10">
-                <div className="text-right hidden sm:block">
-                  <div className="text-xs font-medium text-brand-cream">{currentUser.fullName}</div>
-                  <div className="text-[10px] text-brand-gold uppercase tracking-wider">{currentUser.role}</div>
+              <div className="flex items-center gap-1.5 sm:gap-2 pl-2 sm:pl-3 border-l border-white/10">
+                <div className="text-right hidden md:block">
+                  <div className="text-xs font-semibold text-brand-cream leading-tight truncate max-w-[120px]">{currentUser.fullName}</div>
+                  <div className="text-[9px] text-brand-gold uppercase tracking-wider font-medium">{currentUser.role}</div>
                 </div>
                 <button
                   onClick={() => setPasswordModalOpen(true)}
-                  className="p-1.5 sm:py-1.5 sm:px-2 rounded-lg bg-brand-surface hover:border-brand-gold/40 border border-white/10 text-xs text-brand-muted hover:text-brand-cream transition-colors flex items-center"
-                  title="Update Password"
+                  className="w-8 h-8 rounded-lg bg-brand-surface hover:border-brand-gold/40 border border-white/10 text-brand-muted hover:text-brand-cream transition-colors flex items-center justify-center flex-shrink-0 active:scale-95"
+                  title="Update Master Password"
+                  aria-label="Update Master Password"
                 >
                   <Key className="w-3.5 h-3.5 text-brand-gold" />
                 </button>
                 <button
                   onClick={handleSignOut}
-                  className="p-1.5 sm:py-1.5 sm:px-2 rounded-lg bg-brand-surface hover:bg-red-950/60 hover:text-red-300 border border-white/10 text-xs text-brand-muted transition-colors flex items-center"
+                  className="w-8 h-8 rounded-lg bg-brand-surface hover:bg-red-950/60 hover:text-red-300 border border-white/10 text-brand-muted transition-colors flex items-center justify-center flex-shrink-0 active:scale-95"
                   title="Sign Out"
+                  aria-label="Sign Out"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -554,112 +589,146 @@ export default function DeskDashboard({
             )}
           </div>
         </div>
+
+        {/* Mobile Quick Action Bar (Visible only on < sm screens) */}
+        <div className="sm:hidden px-4 py-2 bg-brand-surface/90 border-t border-white/5 flex items-center gap-2">
+          <button
+            onClick={() => {
+              setBookingError(null);
+              setAddBookingModalOpen(true);
+            }}
+            className="flex-1 h-10 rounded-xl bg-brand-gold text-brand-dark font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-brand-gold/15 active:scale-98 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ Add Booking</span>
+          </button>
+          <button
+            onClick={() => {
+              setCreatedMemberResult(null);
+              setNewMemberName('');
+              setNewMemberEmail('');
+              setNewMemberPhone('+91 ');
+              setNewMemberRole('PLANNER');
+              setNewMemberPassword('Partner@2026!');
+              setTeamModalOpen(true);
+            }}
+            className="h-10 px-3.5 rounded-xl bg-brand-charcoal text-brand-muted hover:text-brand-cream border border-white/10 font-medium text-xs flex items-center justify-center gap-1.5 active:scale-98 transition-all"
+          >
+            <Users className="w-3.5 h-3.5 text-brand-gold" />
+            <span>+ Partner</span>
+          </button>
+        </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8">
         {/* Header Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-lg">
-            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1 truncate">Total Inquiries</div>
-            <div className="text-2xl sm:text-3xl font-serif font-bold text-brand-cream">{leads.length}</div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-4 mb-5 sm:mb-8">
+          <div className="bg-brand-charcoal/70 border border-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm transition-all hover:border-brand-gold/20">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1.5">
+              <span>Total Leads</span>
+              <FileText className="w-3.5 h-3.5 text-brand-gold/70" />
+            </div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-brand-cream">{leads.length}</div>
           </div>
-          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-lg">
-            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1 truncate">Scheduled Visits</div>
-            <div className="text-2xl sm:text-3xl font-serif font-bold text-purple-400">{allVisits.length}</div>
+          <div className="bg-brand-charcoal/70 border border-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm transition-all hover:border-brand-gold/20">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1.5">
+              <span>Visits &amp; Tastings</span>
+              <Calendar className="w-3.5 h-3.5 text-purple-400/80" />
+            </div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-purple-400">{allVisits.length}</div>
           </div>
-          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-lg">
-            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1 truncate">Active Proposals</div>
-            <div className="text-2xl sm:text-3xl font-serif font-bold text-indigo-400">
+          <div className="bg-brand-charcoal/70 border border-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm transition-all hover:border-brand-gold/20">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1.5">
+              <span>Quotes Sent</span>
+              <Send className="w-3.5 h-3.5 text-indigo-400/80" />
+            </div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-indigo-400">
               {leads.filter((l) => l.status === 'PROPOSAL_SENT').length}
             </div>
           </div>
-          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-lg">
-            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1 truncate">Confirmed Bookings</div>
-            <div className="text-2xl sm:text-3xl font-serif font-bold text-emerald-400">
+          <div className="bg-brand-charcoal/70 border border-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm transition-all hover:border-brand-gold/20">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1.5">
+              <span>Confirmed</span>
+              <CheckCircle className="w-3.5 h-3.5 text-emerald-400/80" />
+            </div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-emerald-400">
               {leads.filter((l) => l.status === 'BOOKED').length}
             </div>
           </div>
-          <div className="bg-brand-charcoal/70 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 shadow-lg col-span-2 sm:col-span-1">
-            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-emerald-400 mb-1 truncate">Advances Collected</div>
-            <div className="text-2xl sm:text-3xl font-sans font-bold text-emerald-400">
-              ₹{totalCollectedRevenue.toLocaleString('en-IN')}
+          <div className="bg-brand-charcoal/70 border border-emerald-500/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm col-span-2 lg:col-span-1">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs uppercase tracking-wider text-emerald-400 mb-1.5">
+              <span>Advances Collected</span>
+              <IndianRupee className="w-3.5 h-3.5 text-emerald-400" />
+            </div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-sans font-bold text-emerald-400 flex items-baseline gap-1">
+              <span>₹{totalCollectedRevenue.toLocaleString('en-IN')}</span>
+            </div>
+            <div className="text-[10px] text-brand-muted mt-0.5 truncate">
+              {allPayments.length} recorded • ₹{totalOutstanding.toLocaleString('en-IN')} balance
             </div>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-b border-white/10 pb-3 mb-6">
+        <div className="border-b border-white/10 pb-2.5 mb-5 sm:mb-6">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth py-1 -mx-4 px-4 sm:mx-0 sm:px-0 flex-1">
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 -mx-3 px-3 sm:mx-0 sm:px-0 flex-1">
               <button
                 onClick={() => setActiveTab('pipeline')}
-                className={`py-2 px-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
+                className={`h-9 px-3 sm:px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95 ${
                   activeTab === 'pipeline'
-                    ? 'bg-brand-gold text-brand-dark'
-                    : 'text-brand-muted hover:text-brand-cream'
+                    ? 'bg-brand-gold text-brand-dark shadow-sm'
+                    : 'bg-brand-surface/60 text-brand-muted hover:text-brand-cream border border-white/5'
                 }`}
               >
-                <span>Pipeline</span><span className="hidden sm:inline"> Board</span>
+                <Kanban className="w-3.5 h-3.5" />
+                <span>Pipeline</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'pipeline' ? 'bg-brand-dark/20 text-brand-dark' : 'bg-white/10 text-brand-muted'}`}>
+                  {leads.length}
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab('visits')}
-                className={`py-2 px-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                className={`h-9 px-3 sm:px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95 ${
                   activeTab === 'visits'
-                    ? 'bg-brand-gold text-brand-dark'
-                    : 'text-brand-muted hover:text-brand-cream'
+                    ? 'bg-brand-gold text-brand-dark shadow-sm'
+                    : 'bg-brand-surface/60 text-brand-muted hover:text-brand-cream border border-white/5'
                 }`}
               >
                 <Calendar className="w-3.5 h-3.5" />
-                <span>Visits</span><span className="hidden sm:inline"> &amp; Tastings</span> ({allVisits.length})
+                <span>Visits</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'visits' ? 'bg-brand-dark/20 text-brand-dark' : 'bg-white/10 text-brand-muted'}`}>
+                  {allVisits.length}
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab('ledger')}
-                className={`py-2 px-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                className={`h-9 px-3 sm:px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95 ${
                   activeTab === 'ledger'
-                    ? 'bg-brand-gold text-brand-dark'
-                    : 'text-brand-muted hover:text-brand-cream'
+                    ? 'bg-brand-gold text-brand-dark shadow-sm'
+                    : 'bg-brand-surface/60 text-brand-muted hover:text-brand-cream border border-white/5'
                 }`}
               >
                 <IndianRupee className="w-3.5 h-3.5" />
-                <span>Ledger</span><span className="hidden sm:inline"> &amp; Advances</span> ({allPayments.length})
+                <span>Ledger</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'ledger' ? 'bg-brand-dark/20 text-brand-dark' : 'bg-white/10 text-brand-muted'}`}>
+                  {allPayments.length}
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab('team')}
-                className={`py-2 px-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                className={`h-9 px-3 sm:px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95 ${
                   activeTab === 'team'
-                    ? 'bg-brand-gold text-brand-dark'
-                    : 'text-brand-muted hover:text-brand-cream'
+                    ? 'bg-brand-gold text-brand-dark shadow-sm'
+                    : 'bg-brand-surface/60 text-brand-muted hover:text-brand-cream border border-white/5'
                 }`}
               >
                 <Users className="w-3.5 h-3.5" />
-                <span>Team</span><span className="hidden sm:inline"> &amp; Partners</span> ({team.length})
-              </button>
-            </div>
-
-            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
-              <button
-                onClick={() => {
-                  setBookingError(null);
-                  setAddBookingModalOpen(true);
-                }}
-                className="py-1.5 px-3 rounded-lg bg-brand-gold/15 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold hover:text-brand-dark font-semibold text-xs transition-colors flex items-center gap-1"
-              >
-                <Plus className="w-3 h-3" /> + Add Booking
-              </button>
-              <button
-                onClick={() => {
-                  setCreatedMemberResult(null);
-                  setNewMemberName('');
-                  setNewMemberEmail('');
-                  setNewMemberPhone('+91 ');
-                  setNewMemberRole('PLANNER');
-                  setNewMemberPassword('Partner@2026!');
-                  setTeamModalOpen(true);
-                }}
-                className="py-1.5 px-3 rounded-lg bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/10 font-medium text-xs transition-colors flex items-center gap-1"
-              >
-                <Users className="w-3 h-3" /> + Enroll Partner
+                <span>Team</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'team' ? 'bg-brand-dark/20 text-brand-dark' : 'bg-white/10 text-brand-muted'}`}>
+                  {team.length}
+                </span>
               </button>
             </div>
           </div>
@@ -787,18 +856,18 @@ export default function DeskDashboard({
                               <a
                                 href={`tel:${lead.clientPhone}`}
                                 title={`Call ${lead.clientName} (${lead.clientPhone})`}
-                                className="w-7 h-7 rounded-lg bg-brand-surface text-brand-cream hover:bg-brand-gold hover:text-brand-dark transition-colors flex items-center justify-center text-xs"
+                                className="w-8 h-8 rounded-lg bg-brand-surface text-brand-cream hover:bg-brand-gold hover:text-brand-dark transition-colors flex items-center justify-center text-xs active:scale-95"
                               >
-                                <Phone className="w-3 h-3" />
+                                <Phone className="w-3.5 h-3.5" />
                               </a>
                               <a
                                 href={`https://wa.me/${lead.clientPhone.replace(/[^0-9]/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 title={`WhatsApp ${lead.clientName}`}
-                                className="w-7 h-7 rounded-lg bg-emerald-950/60 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center text-xs"
+                                className="w-8 h-8 rounded-lg bg-emerald-950/60 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center text-xs active:scale-95"
                               >
-                                <MessageCircle className="w-3 h-3" />
+                                <MessageCircle className="w-3.5 h-3.5" />
                               </a>
                             </div>
 
@@ -815,7 +884,7 @@ export default function DeskDashboard({
                                   setRecordedPaymentResult(null);
                                   setPaymentModalOpen(true);
                                 }}
-                                className="w-7 h-7 rounded-lg bg-emerald-950/60 text-emerald-300 hover:bg-emerald-600 hover:text-white transition-colors flex items-center justify-center font-bold text-xs"
+                                className="w-8 h-8 rounded-lg bg-emerald-950/60 text-emerald-300 hover:bg-emerald-600 hover:text-white transition-colors flex items-center justify-center font-bold text-xs active:scale-95"
                                 title="Record Advance or Milestone Payment (₹)"
                               >
                                 ₹
@@ -827,10 +896,10 @@ export default function DeskDashboard({
                                   setVisitLocation(lead.venueName || `${lead.venueCity || 'Punalur'}`);
                                   setVisitModalOpen(true);
                                 }}
-                                className="w-7 h-7 rounded-lg bg-brand-surface text-brand-gold hover:bg-brand-gold hover:text-brand-dark transition-colors flex items-center justify-center text-xs"
+                                className="w-8 h-8 rounded-lg bg-brand-surface text-brand-gold hover:bg-brand-gold hover:text-brand-dark transition-colors flex items-center justify-center text-xs active:scale-95"
                                 title="Schedule Venue Site Visit"
                               >
-                                <Calendar className="w-3 h-3" />
+                                <Calendar className="w-3.5 h-3.5" />
                               </button>
 
                               <button
@@ -839,10 +908,10 @@ export default function DeskDashboard({
                                   setGeneratedQuoteResult(null);
                                   setQuoteModalOpen(true);
                                 }}
-                                className="w-7 h-7 rounded-lg bg-brand-surface text-indigo-300 hover:bg-indigo-600 hover:text-white transition-colors flex items-center justify-center text-xs"
+                                className="w-8 h-8 rounded-lg bg-brand-surface text-indigo-300 hover:bg-indigo-600 hover:text-white transition-colors flex items-center justify-center text-xs active:scale-95"
                                 title="Draft Official Proposal Quote"
                               >
-                                <FileText className="w-3 h-3" />
+                                <FileText className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </div>
@@ -851,7 +920,7 @@ export default function DeskDashboard({
                           {lead.status === 'NEW' && (
                             <button
                               onClick={() => updateStatus(lead.id, 'CONTACTED')}
-                              className="w-full mt-2 py-1.5 px-3 rounded-lg bg-brand-surface hover:bg-white/10 text-xs text-brand-muted hover:text-brand-cream transition-colors text-center font-medium"
+                              className="w-full mt-2 h-9 rounded-xl bg-brand-surface hover:bg-white/10 text-xs text-brand-muted hover:text-brand-cream transition-colors flex items-center justify-center font-semibold active:scale-98"
                             >
                               Mark Contacted →
                             </button>
@@ -863,7 +932,7 @@ export default function DeskDashboard({
                                 setVisitLocation(lead.venueName || `${lead.venueCity || 'Punalur'}`);
                                 setVisitModalOpen(true);
                               }}
-                              className="w-full mt-2 py-1.5 px-3 rounded-lg bg-brand-gold/10 hover:bg-brand-gold text-xs text-brand-gold hover:text-brand-dark transition-colors text-center font-medium"
+                              className="w-full mt-2 h-9 rounded-xl bg-brand-gold/15 hover:bg-brand-gold text-xs text-brand-gold hover:text-brand-dark transition-colors flex items-center justify-center font-semibold active:scale-98"
                             >
                               Book Venue Visit →
                             </button>
@@ -875,9 +944,17 @@ export default function DeskDashboard({
                                 setGeneratedQuoteResult(null);
                                 setQuoteModalOpen(true);
                               }}
-                              className="w-full mt-2 py-1.5 px-3 rounded-lg bg-indigo-950/60 hover:bg-indigo-600 text-xs text-indigo-300 hover:text-white transition-colors text-center font-medium"
+                              className="w-full mt-2 h-9 rounded-xl bg-indigo-950/60 hover:bg-indigo-600 text-xs text-indigo-300 hover:text-white transition-colors flex items-center justify-center font-semibold active:scale-98"
                             >
                               Draft Official Quote →
+                            </button>
+                          )}
+                          {lead.status === 'PROPOSAL_SENT' && (
+                            <button
+                              onClick={() => updateStatus(lead.id, 'BOOKED')}
+                              className="w-full mt-2 h-9 rounded-xl bg-emerald-950/60 hover:bg-emerald-600 text-xs text-emerald-300 hover:text-white transition-colors flex items-center justify-center font-semibold active:scale-98"
+                            >
+                              Confirm Booking ✓
                             </button>
                           )}
                           {lead.status === 'PROPOSAL_SENT' && (
@@ -1138,9 +1215,9 @@ export default function DeskDashboard({
 
       {/* Schedule Visit Modal */}
       {visitModalOpen && selectedLeadForVisit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-brand-charcoal border border-brand-gold/40 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5">
-            <h3 className="text-2xl font-serif text-brand-cream">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-brand-charcoal border border-brand-gold/40 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-lg w-full shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+            <h3 className="text-xl sm:text-2xl font-serif text-brand-cream">
               Schedule Venue Visit
             </h3>
             <p className="text-xs text-brand-muted">
@@ -1228,8 +1305,8 @@ export default function DeskDashboard({
 
       {/* Quote Generator Modal */}
       {quoteModalOpen && selectedLeadForQuote && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-brand-charcoal border border-brand-gold/40 rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-brand-charcoal border border-brand-gold/40 rounded-2xl p-4 sm:p-6 lg:p-8 max-w-2xl w-full shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-serif text-brand-cream">
@@ -1404,8 +1481,8 @@ export default function DeskDashboard({
 
       {/* Record Payment Modal */}
       {paymentModalOpen && selectedLeadForPayment && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-brand-charcoal border border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-brand-charcoal border border-white/10 rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-white/5">
               <div className="flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm">
@@ -1580,8 +1657,8 @@ export default function DeskDashboard({
 
       {/* Add Team Member & Provision Login Modal */}
       {teamModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-brand-charcoal border border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-brand-charcoal border border-white/10 rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-white/5">
               <div className="flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-brand-gold/10 text-brand-gold flex items-center justify-center text-sm font-semibold">
@@ -1748,8 +1825,8 @@ export default function DeskDashboard({
 
       {/* Change Password Modal */}
       {passwordModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-brand-charcoal border border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-brand-charcoal border border-white/10 rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-white/5">
               <div className="flex items-center gap-2">
                 <span className="w-8 h-8 rounded-lg bg-brand-gold/10 text-brand-gold flex items-center justify-center text-sm font-semibold">
@@ -1854,8 +1931,8 @@ export default function DeskDashboard({
 
       {/* Manual Booking Creation Modal (+ Add Booking) */}
       {addBookingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-brand-charcoal border border-brand-gold/40 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-brand-charcoal border border-brand-gold/40 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 max-w-2xl w-full shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-white/5">
               <div className="flex items-center gap-3">
                 <span className="w-10 h-10 rounded-xl bg-brand-gold/15 text-brand-gold flex items-center justify-center font-bold text-lg border border-brand-gold/30">

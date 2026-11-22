@@ -1,9 +1,15 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import DeskDashboard from '@/components/DeskDashboard';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Workspace — Occasion Desk',
+  description: 'Enterprise event operations, booking pipeline, visit scheduling, and advance ledger.',
+};
 
 export default async function DeskPage() {
   const user = await getCurrentUser();

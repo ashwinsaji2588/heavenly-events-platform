@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, signToken } from '@/lib/auth';
+import { sanitizeString, sanitizeEmail, sanitizePhone } from '@/lib/sanitize';
 
 export async function POST(req: Request) {
   try {
+    const body = await req.json();
     const {
       firmName,
       businessCategory,
@@ -12,11 +14,17 @@ export async function POST(req: Request) {
       adminName,
       adminEmail,
       adminPassword,
-    } = await req.json();
+    } = body;
 
-    if (!firmName?.trim() || !adminName?.trim() || !adminEmail?.trim() || !adminPassword?.trim()) {
+    const cleanFirmName = sanitizeString(firmName, 120);
+    const cleanAdminName = sanitizeString(adminName, 100);
+    const cleanEmail = sanitizeEmail(adminEmail);
+    const cleanPhone = phone ? sanitizePhone(phone) : '';
+    const cleanCity = city ? sanitizeString(city, 80) : '';
+
+    if (!cleanFirmName || !cleanAdminName || !cleanEmail || !adminPassword?.trim()) {
       return NextResponse.json(
-        { error: 'Firm name, admin name, official email, and master password are required.' },
+        { error: 'Valid firm name, admin name, official email, and master password are required.' },
         { status: 400 }
       );
     }
@@ -27,8 +35,6 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
-    const cleanEmail = adminEmail.toLowerCase().trim();
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -43,7 +49,7 @@ export async function POST(req: Request) {
     }
 
     // Generate unique slug for the organization
-    const baseSlug = firmName
+    const baseSlug = cleanFirmName
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]+/g, '-')
@@ -83,12 +89,12 @@ export async function POST(req: Request) {
     const result = await prisma.$transaction(async (tx) => {
       const organization = await tx.organization.create({
         data: {
-          name: firmName.trim(),
+          name: cleanFirmName,
           slug: uniqueSlug,
-          phone: phone?.trim() || '+91 ',
+          phone: cleanPhone || '+91 ',
           email: cleanEmail,
           settings: {
-            city: city?.trim() || 'Kerala, India',
+            city: cleanCity || 'Kerala, India',
             defaultCurrency: 'INR',
             timezone: 'Asia/Kolkata',
             businessCategory: category,
@@ -99,9 +105,9 @@ export async function POST(req: Request) {
       const superAdmin = await tx.user.create({
         data: {
           orgId: organization.id,
-          fullName: adminName.trim(),
+          fullName: cleanAdminName,
           email: cleanEmail,
-          phone: phone?.trim() || null,
+          phone: cleanPhone || null,
           role: 'SUPER_ADMIN',
           passwordHash,
         },
@@ -116,7 +122,7 @@ export async function POST(req: Request) {
           clientEmail: 'client@example.com',
           occasionType: sampleOccasion,
           venueName: 'The River Palace Auditorium',
-          venueCity: city?.trim() || 'Kerala',
+          venueCity: cleanCity || 'Kerala',
           budgetRange: sampleBudget,
           guestCount: sampleGuestCount,
           status: 'NEW',
