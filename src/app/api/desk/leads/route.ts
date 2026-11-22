@@ -98,6 +98,9 @@ export async function POST(req: Request) {
       metadata = {},
     } = body;
 
+    const validStatuses = ['NEW', 'CONTACTED', 'VISIT_SCHEDULED', 'PROPOSAL_SENT', 'BOOKED', 'ARCHIVED', 'LOST'];
+    const safeStatus = validStatuses.includes(status) ? (status as any) : 'NEW';
+
     if (!clientName?.trim() || !clientPhone?.trim() || !occasionType?.trim()) {
       return NextResponse.json(
         { error: 'Client name, client phone number, and occasion type are required.' },
@@ -118,7 +121,7 @@ export async function POST(req: Request) {
         guestCount: guestCount ? parseInt(String(guestCount), 10) : null,
         budgetRange: budgetRange?.trim() || null,
         notes: notes?.trim() || null,
-        status,
+        status: safeStatus,
         assignedUserId: assignedUserId || user.id,
         metadata: {
           ...metadata,
