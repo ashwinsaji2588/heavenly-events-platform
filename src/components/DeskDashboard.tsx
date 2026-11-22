@@ -100,7 +100,7 @@ export default function DeskDashboard({
   partners: { id: string; fullName: string }[];
   initialTeam?: TeamMember[];
   currentUser?: { id: string; email: string; fullName: string; role: string };
-  organization?: { id?: string; name: string; slug: string; phone?: string; email?: string; settings?: Record<string, unknown> };
+  organization?: { id?: string; name: string; slug: string; phone?: string; email?: string; settings?: any };
 }) {
   const router = useRouter();
   const [leads, setLeads] = useState<Lead[]>(initialLeads);

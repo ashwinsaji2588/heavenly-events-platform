@@ -147,7 +147,8 @@ export async function POST(req: Request) {
 
     // Generate JWT session token
     const token = signToken({
-      userId: result.superAdmin.id,
+      id: result.superAdmin.id,
+      fullName: result.superAdmin.fullName,
       orgId: result.organization.id,
       role: result.superAdmin.role,
       email: result.superAdmin.email,
@@ -174,7 +175,7 @@ export async function POST(req: Request) {
     );
 
     response.cookies.set({
-      name: 'auth_token',
+      name: 'heavenly_session',
       value: token,
       httpOnly: true,
       secure: isHttps,
