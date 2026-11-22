@@ -17,13 +17,13 @@ async function main() {
     where: { slug: 'occasion-desk-demo' },
     update: {
       name: 'Occasion Desk Demo Studio',
-      phone: '+919876543210',
+      phone: '+919188444859',
       email: 'demo@occasiondesk.com',
     },
     create: {
       name: 'Occasion Desk Demo Studio',
       slug: 'occasion-desk-demo',
-      phone: '+919876543210',
+      phone: '+919188444859',
       email: 'demo@occasiondesk.com',
       settings: {
         city: 'Kollam',
@@ -43,7 +43,7 @@ async function main() {
     where: { email: 'demo@occasiondesk.com' },
     update: {
       fullName: 'Alex Morgan (Principal Planner)',
-      phone: '+919876543210',
+      phone: '+919188444859',
       role: 'SUPER_ADMIN',
       orgId: org.id,
       passwordHash: demoPassword,
@@ -52,7 +52,7 @@ async function main() {
       orgId: org.id,
       email: 'demo@occasiondesk.com',
       fullName: 'Alex Morgan (Principal Planner)',
-      phone: '+919876543210',
+      phone: '+919188444859',
       role: 'SUPER_ADMIN',
       passwordHash: demoPassword,
     },

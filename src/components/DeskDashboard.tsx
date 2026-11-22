@@ -28,6 +28,9 @@ import {
   Tag,
   Kanban,
   Send,
+  Zap,
+  ChevronRight,
+  Check,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -194,10 +197,14 @@ export default function DeskDashboard({
     remainingBalance: number;
   } | null>(null);
 
+  // Workflow Playbook State
+  const [workflowModalOpen, setWorkflowModalOpen] = useState(false);
+  const [selectedLeadForWorkflow, setSelectedLeadForWorkflow] = useState<Lead | null>(null);
+
   // New Team Member State
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberEmail, setNewMemberEmail] = useState('');
-  const [newMemberPhone, setNewMemberPhone] = useState('+91 ');
+  const [newMemberPhone, setNewMemberPhone] = useState('+91 9188444859');
   const [newMemberRole, setNewMemberRole] = useState('PLANNER');
   const [newMemberPassword, setNewMemberPassword] = useState('Desk@2026!');
   const [createdMemberResult, setCreatedMemberResult] = useState<{ user: TeamMember; whatsappCredentialsUrl: string | null } | null>(null);
@@ -231,6 +238,26 @@ export default function DeskDashboard({
     { key: 'PROPOSAL_SENT', label: 'Proposal Sent', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
     { key: 'BOOKED', label: 'Confirmed Events', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
   ];
+
+  function getWorkflowProgress(lead: Lead): number {
+    let score = 20; // Stage 1 intake done
+    if (lead.status !== 'NEW') score += 20;
+    if (lead.siteVisits && lead.siteVisits.length > 0) score += 20;
+    if (lead.proposals && lead.proposals.length > 0) score += 20;
+    if ((lead.payments && lead.payments.length > 0) || lead.status === 'BOOKED') score += 20;
+    return Math.min(score, 100);
+  }
+
+  function getWorkflowStepLabel(status: string): string {
+    switch (status) {
+      case 'NEW': return '1. Intake';
+      case 'CONTACTED': return '2. Consultation';
+      case 'VISIT_SCHEDULED': return '3. Site Visit';
+      case 'PROPOSAL_SENT': return '4. Quoted';
+      case 'BOOKED': return '5. Confirmed';
+      default: return 'Active';
+    }
+  }
 
   async function handleCreateTeamMember(e: React.FormEvent) {
     e.preventDefault();
@@ -848,6 +875,32 @@ export default function DeskDashboard({
                               </div>
                             </div>
                           )}
+
+                          {/* Workflow Stage Progress */}
+                          <button
+                            onClick={() => {
+                              setSelectedLeadForWorkflow(lead);
+                              setWorkflowModalOpen(true);
+                            }}
+                            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-brand-surface/60 hover:bg-brand-surface border border-white/5 hover:border-brand-gold/30 transition-all text-left group"
+                            title="Open 5-Step Operational Workflow Guide"
+                          >
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <Zap className="w-3 h-3 text-brand-gold flex-shrink-0 group-hover:scale-110 transition-transform" />
+                              <span className="text-[11px] font-medium text-brand-cream truncate">
+                                Workflow: {getWorkflowStepLabel(lead.status)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                              <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-brand-gold rounded-full transition-all duration-300"
+                                  style={{ width: `${getWorkflowProgress(lead)}%` }}
+                                />
+                              </div>
+                              <span className="text-[10px] font-mono text-brand-gold">{getWorkflowProgress(lead)}%</span>
+                            </div>
+                          </button>
 
                           {/* Quick Actions Toolbar */}
                           <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-1">
@@ -2191,6 +2244,277 @@ export default function DeskDashboard({
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 5-Step Operational Workflow Modal */}
+      {workflowModalOpen && selectedLeadForWorkflow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-brand-charcoal border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl space-y-6">
+            
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-4 border-b border-white/10">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-lg bg-brand-gold/15 text-brand-gold flex items-center justify-center text-xs font-bold">
+                    ⚡
+                  </span>
+                  <span className="text-xs uppercase tracking-wider text-brand-gold font-semibold">
+                    Event Operational Workflow
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-serif text-brand-cream">
+                  {selectedLeadForWorkflow.clientName}
+                </h3>
+                <div className="text-xs text-brand-muted">
+                  {selectedLeadForWorkflow.occasionType} • {selectedLeadForWorkflow.venueName || selectedLeadForWorkflow.venueCity || 'Kerala'}
+                </div>
+              </div>
+              <button
+                onClick={() => setWorkflowModalOpen(false)}
+                className="w-8 h-8 rounded-lg bg-brand-surface text-brand-muted hover:text-brand-cream flex items-center justify-center text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Overall Progress Bar */}
+            <div className="p-4 rounded-xl bg-brand-dark/80 border border-white/5 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-brand-muted font-medium">Lifecycle Completion</span>
+                <span className="font-mono text-brand-gold font-bold">{getWorkflowProgress(selectedLeadForWorkflow)}%</span>
+              </div>
+              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-brand-gold rounded-full transition-all duration-500"
+                  style={{ width: `${getWorkflowProgress(selectedLeadForWorkflow)}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Step-by-Step Interactive Playbook */}
+            <div className="space-y-3">
+              {/* Step 1: Client Intake & Consultation */}
+              <div className="p-3.5 rounded-xl bg-brand-surface/60 border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-[10px] font-bold">
+                      ✓
+                    </span>
+                    <span className="text-xs font-semibold text-brand-cream">Step 1: Intake & Consultation</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400">COMPLETED</span>
+                </div>
+                <p className="text-[11px] text-brand-muted pl-7">
+                  Client inquiry logged. Direct phone: {selectedLeadForWorkflow.clientPhone}.
+                </p>
+                <div className="flex items-center gap-2 pl-7 pt-1">
+                  <a
+                    href={`tel:${selectedLeadForWorkflow.clientPhone}`}
+                    className="py-1 px-2.5 rounded-lg bg-brand-charcoal hover:bg-brand-gold hover:text-brand-dark text-brand-cream text-[11px] font-medium border border-white/10 transition-colors inline-flex items-center gap-1"
+                  >
+                    <Phone className="w-3 h-3" /> Call Client
+                  </a>
+                  <a
+                    href={`https://wa.me/${selectedLeadForWorkflow.clientPhone.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-1 px-2.5 rounded-lg bg-emerald-950/60 text-emerald-300 hover:bg-emerald-600 hover:text-white text-[11px] font-medium border border-emerald-500/30 transition-colors inline-flex items-center gap-1"
+                  >
+                    <MessageCircle className="w-3 h-3" /> WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              {/* Step 2: Site Walkthrough & Tasting */}
+              <div className="p-3.5 rounded-xl bg-brand-surface/60 border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border ${
+                      selectedLeadForWorkflow.siteVisits && selectedLeadForWorkflow.siteVisits.length > 0
+                        ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/30'
+                        : 'bg-white/5 text-brand-muted border-white/10'
+                    }`}>
+                      {selectedLeadForWorkflow.siteVisits && selectedLeadForWorkflow.siteVisits.length > 0 ? '✓' : '2'}
+                    </span>
+                    <span className="text-xs font-semibold text-brand-cream">Step 2: Site Visit & Tasting</span>
+                  </div>
+                  <span className={`text-[10px] font-mono ${
+                    selectedLeadForWorkflow.siteVisits && selectedLeadForWorkflow.siteVisits.length > 0 ? 'text-emerald-400' : 'text-amber-400'
+                  }`}>
+                    {selectedLeadForWorkflow.siteVisits && selectedLeadForWorkflow.siteVisits.length > 0 ? `${selectedLeadForWorkflow.siteVisits.length} SCHEDULED` : 'PENDING'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-brand-muted pl-7">
+                  Venue dimensions, ceiling truss rigging, and food tasting schedule.
+                </p>
+                <div className="flex items-center gap-2 pl-7 pt-1">
+                  <button
+                    onClick={() => {
+                      setWorkflowModalOpen(false);
+                      setSelectedLeadForVisit(selectedLeadForWorkflow);
+                      setVisitLocation(selectedLeadForWorkflow.venueName || `${selectedLeadForWorkflow.venueCity || 'Kerala'}`);
+                      setVisitModalOpen(true);
+                    }}
+                    className="py-1 px-2.5 rounded-lg bg-brand-charcoal hover:bg-purple-600 hover:text-white text-purple-300 text-[11px] font-medium border border-purple-500/30 transition-colors inline-flex items-center gap-1"
+                  >
+                    <Calendar className="w-3 h-3" /> + Schedule Site Visit
+                  </button>
+                  {selectedLeadForWorkflow.siteVisits && selectedLeadForWorkflow.siteVisits.length > 0 && (
+                    <a
+                      href={`/api/desk/visits/${selectedLeadForWorkflow.siteVisits[0].id}/ics`}
+                      download
+                      className="py-1 px-2.5 rounded-lg bg-brand-charcoal hover:text-brand-gold text-brand-muted text-[11px] font-medium border border-white/10 transition-colors inline-flex items-center gap-1"
+                    >
+                      Export .ICS
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Step 3: Itemized Proposal */}
+              <div className="p-3.5 rounded-xl bg-brand-surface/60 border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border ${
+                      selectedLeadForWorkflow.proposals && selectedLeadForWorkflow.proposals.length > 0
+                        ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/30'
+                        : 'bg-white/5 text-brand-muted border-white/10'
+                    }`}>
+                      {selectedLeadForWorkflow.proposals && selectedLeadForWorkflow.proposals.length > 0 ? '✓' : '3'}
+                    </span>
+                    <span className="text-xs font-semibold text-brand-cream">Step 3: Itemized Proposal</span>
+                  </div>
+                  <span className={`text-[10px] font-mono ${
+                    selectedLeadForWorkflow.proposals && selectedLeadForWorkflow.proposals.length > 0 ? 'text-emerald-400' : 'text-amber-400'
+                  }`}>
+                    {selectedLeadForWorkflow.proposals && selectedLeadForWorkflow.proposals.length > 0
+                      ? `QUOTE: ₹${Number(selectedLeadForWorkflow.proposals[0].totalAmount).toLocaleString('en-IN')}`
+                      : 'NOT SENT'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-brand-muted pl-7">
+                  Mandap, floral styling, banquet catering per-plate split, and deposit requirements.
+                </p>
+                <div className="flex items-center gap-2 pl-7 pt-1">
+                  <button
+                    onClick={() => {
+                      setWorkflowModalOpen(false);
+                      setSelectedLeadForQuote(selectedLeadForWorkflow);
+                      setGeneratedQuoteResult(null);
+                      setQuoteModalOpen(true);
+                    }}
+                    className="py-1 px-2.5 rounded-lg bg-brand-charcoal hover:bg-indigo-600 hover:text-white text-indigo-300 text-[11px] font-medium border border-indigo-500/30 transition-colors inline-flex items-center gap-1"
+                  >
+                    <FileText className="w-3 h-3" /> {selectedLeadForWorkflow.proposals && selectedLeadForWorkflow.proposals.length > 0 ? 'Create New Revision' : '+ Draft Proposal'}
+                  </button>
+                  {selectedLeadForWorkflow.proposals && selectedLeadForWorkflow.proposals.length > 0 && (
+                    <Link
+                      href={`/proposals/${selectedLeadForWorkflow.proposals[0].id}`}
+                      target="_blank"
+                      className="py-1 px-2.5 rounded-lg bg-brand-charcoal hover:text-brand-gold text-brand-muted text-[11px] font-medium border border-white/10 transition-colors inline-flex items-center gap-1"
+                    >
+                      <ExternalLink className="w-3 h-3" /> View Proposal
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {/* Step 4: Advance Booking Deposit */}
+              <div className="p-3.5 rounded-xl bg-brand-surface/60 border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border ${
+                      selectedLeadForWorkflow.payments && selectedLeadForWorkflow.payments.length > 0
+                        ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/30'
+                        : 'bg-white/5 text-brand-muted border-white/10'
+                    }`}>
+                      {selectedLeadForWorkflow.payments && selectedLeadForWorkflow.payments.length > 0 ? '✓' : '4'}
+                    </span>
+                    <span className="text-xs font-semibold text-brand-cream">Step 4: Advance Deposit & Lock-in</span>
+                  </div>
+                  <span className={`text-[10px] font-mono ${
+                    selectedLeadForWorkflow.payments && selectedLeadForWorkflow.payments.length > 0 ? 'text-emerald-400' : 'text-amber-400'
+                  }`}>
+                    {selectedLeadForWorkflow.payments && selectedLeadForWorkflow.payments.length > 0
+                      ? `COLLECTED: ₹${(selectedLeadForWorkflow.payments || []).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString('en-IN')}`
+                      : 'AWAITING ADVANCE'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-brand-muted pl-7">
+                  Record advance deposit via UPI, bank transfer, or cash. Auto-advances booking to BOOKED.
+                </p>
+                <div className="flex items-center gap-2 pl-7 pt-1">
+                  <button
+                    onClick={() => {
+                      setWorkflowModalOpen(false);
+                      setSelectedLeadForPayment(selectedLeadForWorkflow);
+                      const quote = selectedLeadForWorkflow.proposals?.[0];
+                      const paid = (selectedLeadForWorkflow.payments || []).reduce((sum, p) => sum + Number(p.amount), 0);
+                      const suggested = quote ? Math.max(0, Number(quote.depositRequired) - paid) : 0;
+                      setPaymentAmount(suggested > 0 ? String(suggested) : '');
+                      setPaymentRef('');
+                      setRecordedPaymentResult(null);
+                      setPaymentModalOpen(true);
+                    }}
+                    className="py-1 px-2.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-600 hover:text-white text-emerald-300 text-[11px] font-medium border border-emerald-500/30 transition-colors inline-flex items-center gap-1"
+                  >
+                    <IndianRupee className="w-3 h-3" /> Record Advance Payment
+                  </button>
+                </div>
+              </div>
+
+              {/* Step 5: Confirmed & Day-of Execution */}
+              <div className="p-3.5 rounded-xl bg-brand-surface/60 border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border ${
+                      selectedLeadForWorkflow.status === 'BOOKED'
+                        ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/30'
+                        : 'bg-white/5 text-brand-muted border-white/10'
+                    }`}>
+                      {selectedLeadForWorkflow.status === 'BOOKED' ? '✓' : '5'}
+                    </span>
+                    <span className="text-xs font-semibold text-brand-cream">Step 5: Event Confirmed & Day-of Ready</span>
+                  </div>
+                  <span className={`text-[10px] font-mono ${
+                    selectedLeadForWorkflow.status === 'BOOKED' ? 'text-emerald-400' : 'text-brand-muted'
+                  }`}>
+                    {selectedLeadForWorkflow.status === 'BOOKED' ? 'LOCKED IN' : 'IN PROGRESS'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-brand-muted pl-7">
+                  All milestones set. Partner execution handover ready for execution day.
+                </p>
+                {selectedLeadForWorkflow.status !== 'BOOKED' && (
+                  <div className="pl-7 pt-1">
+                    <button
+                      onClick={() => {
+                        updateStatus(selectedLeadForWorkflow.id, 'BOOKED');
+                        setWorkflowModalOpen(false);
+                      }}
+                      className="py-1.5 px-3 rounded-lg bg-brand-gold text-brand-dark text-[11px] font-bold hover:bg-brand-goldHover transition-all inline-flex items-center gap-1 shadow-sm"
+                    >
+                      <CheckCircle className="w-3 h-3" /> Mark Officially Booked
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+              <span className="text-[11px] text-brand-muted">
+                Direct Line: +91 91884 44859
+              </span>
+              <button
+                onClick={() => setWorkflowModalOpen(false)}
+                className="py-2 px-4 rounded-xl bg-brand-surface text-brand-cream text-xs font-medium border border-white/10 hover:bg-brand-charcoal"
+              >
+                Close Workflow
+              </button>
+            </div>
+
           </div>
         </div>
       )}

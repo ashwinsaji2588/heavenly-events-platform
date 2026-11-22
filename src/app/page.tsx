@@ -27,10 +27,16 @@ import {
   Building2,
   ArrowUpRight,
   TrendingUp,
+  ChevronRight,
+  Check,
+  MapPin,
+  Receipt,
+  MessageCircle,
 } from 'lucide-react';
 
 export default function SaaSProductLandingPage() {
   const [activeIndustry, setActiveIndustry] = useState<'events' | 'catering' | 'decor' | 'av'>('events');
+  const [activeWorkflowStep, setActiveWorkflowStep] = useState<number>(1);
 
   const industries = [
     {
@@ -104,6 +110,139 @@ export default function SaaSProductLandingPage() {
       ],
       previewHeadline: 'Gala Sangeet & Acoustic Curve Truss',
       previewDetails: '12 Moving Heads • 25kW Generator Load • Cold Spark Cues',
+    },
+  ];
+
+  const workflowSteps = [
+    {
+      step: 1,
+      name: 'Intake & Rapid Triage',
+      shortName: '1. Intake',
+      icon: PhoneCall,
+      subtitle: 'Capture every phone call, Instagram DM, and walk-in lead in 30 seconds.',
+      description:
+        'Stop losing booking details in individual chat threads. Centralize every inquiry with client name, phone number, occasion type, venue city, and budget range into an active Kanban card.',
+      deliverables: [
+        'Instant manual intake modal with field validation',
+        'Automatic routing to uncontacted triage queue',
+        'Zero lost phone numbers or forgotten follow-ups',
+      ],
+      previewCard: {
+        stepBadge: 'Stage 01 • Ingestion',
+        title: 'Wedding Ceremony & Reception',
+        clientName: 'Priya & Vignesh',
+        clientPhone: '+91 91884 44859',
+        venue: 'Grand Waterfront Ballroom, Kollam',
+        date: '28 Dec 2026',
+        budget: '₹4,50,000 - ₹6,00,000',
+        status: 'NEW INQUIRY',
+        statusClass: 'bg-brand-gold/15 text-brand-gold border-brand-gold/30',
+        actionSnippet: 'Next Action: Mark Contacted & Assign Lead Planner',
+      },
+    },
+    {
+      step: 2,
+      name: 'Partner Delegation & Privacy',
+      shortName: '2. Delegation',
+      icon: Users,
+      subtitle: 'Delegate catering, lighting, and décor without leaking agency profit margins.',
+      description:
+        'Invite head chefs, stage decorators, and sound technicians to your workspace. Field-level privacy safeguards sensitive agency fees and overall client budget so partners see only their execution scope.',
+      deliverables: [
+        'Dedicated partner accounts with role-scoped logins',
+        'Confidential agency markups masked by default',
+        'One-click WhatsApp credentials dispatch to new partners',
+      ],
+      previewCard: {
+        stepBadge: 'Stage 02 • Delegation',
+        title: 'Stage Mandap & Amber Lighting Truss',
+        clientName: 'Assigned Partner: Décor Lead (Alex Morgan)',
+        clientPhone: '+91 91884 44859',
+        venue: 'Floral Arch & LED Beam Rigging',
+        date: 'Scope Handoff Active',
+        budget: 'Confidential Agency Scope [Masked]',
+        status: 'DELEGATED',
+        statusClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+        actionSnippet: 'Partner View Active • Agency Net Margin Protected',
+      },
+    },
+    {
+      step: 3,
+      name: 'Site Inspection & Menu Tastings',
+      shortName: '3. Site Visits',
+      icon: Calendar,
+      subtitle: 'Coordinate venue measurements and tasting approvals with live .ICS calendar sync.',
+      description:
+        'Schedule on-site ballroom walkthroughs and tasting sessions. Occasion Desk generates synchronized .ics calendar files that import directly into Google Calendar and Apple Calendar for planners and clients.',
+      deliverables: [
+        'Universal .ICS calendar invitations generated instantly',
+        'Venue GPS directions and walkthrough checklist embedded',
+        'Live countdown to inspection with zero double-booking risk',
+      ],
+      previewCard: {
+        stepBadge: 'Stage 03 • Inspection',
+        title: 'Venue Walkthrough & Food Tasting',
+        clientName: 'Client: Priya & Vignesh (650 Guests)',
+        clientPhone: '+91 91884 44859',
+        venue: 'The Grand Waterfront Ballroom, Kollam',
+        date: 'Thursday, 3:30 PM - 5:30 PM',
+        budget: 'Checklist: Truss points, Generator load, Bride aisle',
+        status: 'VISIT CONFIRMED',
+        statusClass: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+        actionSnippet: 'Synced with Google & Apple Calendar (.ics ready)',
+      },
+    },
+    {
+      step: 4,
+      name: 'Itemized Digital Proposals',
+      shortName: '4. Quotations',
+      icon: FileText,
+      subtitle: 'Transparent line-item scope that clients accept on WhatsApp in one tap.',
+      description:
+        'Itemize stage décor, buffet headcount per plate, ambient lighting, and photography. Occasion Desk calculates deposit percentages automatically and renders an elegant, print-ready digital proposal URL.',
+      deliverables: [
+        'Dynamic itemized line items with live total calculations',
+        'Configurable deposit percentage requirement (20% - 50%)',
+        'Direct "Accept Proposal via WhatsApp" button for instant client signoff',
+      ],
+      previewCard: {
+        stepBadge: 'Stage 04 • Proposal',
+        title: 'Proposal #PROP-8392 Scope Breakdown',
+        clientName: 'Total Scope: ₹4,80,000 (INR)',
+        clientPhone: '+91 91884 44859',
+        venue: 'Mandap (₹1.8L) • Banquets (₹2.4L) • Sound (₹60k)',
+        date: '25% Required Deposit: ₹1,20,000',
+        budget: 'Digital Shareable Link Active',
+        status: 'PROPOSAL DISPATCHED',
+        statusClass: 'bg-brand-gold/15 text-brand-gold border-brand-gold/30',
+        actionSnippet: 'Client Acceptance via 1-Click WhatsApp CTA',
+      },
+    },
+    {
+      step: 5,
+      name: 'Advance Ledger & WhatsApp Receipts',
+      shortName: '5. Lock-in',
+      icon: TrendingUp,
+      subtitle: 'Record lock-in deposits and dispatch branded WhatsApp payment receipts instantly.',
+      description:
+        'Log UPI transactions, bank transfers, or cash advances. The instant the advance is recorded, Occasion Desk auto-advances the lead to BOOKED and generates a formatted payment receipt card ready to share with the client.',
+      deliverables: [
+        'Automated progression from PROPOSAL_SENT to BOOKED upon deposit',
+        'Pre-composed WhatsApp receipt card with payment reference',
+        'Real-time cash ledger tracking advances vs. outstanding balances',
+      ],
+      previewCard: {
+        stepBadge: 'Stage 05 • Locked Date',
+        title: '₹1,20,000 Advance Deposit Recorded',
+        clientName: 'Client: Priya & Vignesh (Confirmed)',
+        clientPhone: '+91 91884 44859',
+        venue: 'Method: Google Pay (UTR #93827104)',
+        date: 'Remaining Balance: ₹3,60,000',
+        budget: 'Date Officially Confirmed on Master Ledger',
+        status: 'BOOKED & SECURED',
+        statusClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+        actionSnippet: 'WhatsApp Receipt Card Dispatched • Date Locked',
+      },
     },
   ];
 
@@ -487,6 +626,166 @@ export default function SaaSProductLandingPage() {
             </ScrollReveal>
 
           </div>
+
+        </div>
+      </section>
+
+      {/* 5-Stage Event Operations Workflow */}
+      <section id="workflows" className="py-24 bg-brand-charcoal/30 relative border-b border-white/5 scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <ScrollReveal direction="up">
+            <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+              <span className="text-xs uppercase tracking-widest text-brand-gold font-semibold flex items-center justify-center gap-1.5">
+                <Zap className="w-3.5 h-3.5" />
+                Operational Blueprint
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-serif text-brand-cream text-balance">
+                The 5-Stage Event Operating Workflow
+              </h2>
+              <p className="text-brand-muted text-sm sm:text-base text-pretty">
+                How elite event planners, catering heads, and stage décor studios take a booking from first phone call to final day-of execution with zero WhatsApp chaos.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          {/* Step Pill Navigation (Mobile Scrollable) */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 sm:justify-center">
+            {workflowSteps.map((s) => {
+              const Icon = s.icon;
+              const isActive = activeWorkflowStep === s.step;
+              return (
+                <button
+                  key={s.step}
+                  onClick={() => setActiveWorkflowStep(s.step)}
+                  className={`py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 active:scale-95 border ${
+                    isActive
+                      ? 'bg-brand-gold text-brand-dark border-brand-gold shadow-lg shadow-brand-gold/15'
+                      : 'bg-brand-surface/70 text-brand-muted hover:text-brand-cream border-white/10'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{s.shortName}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Step Showcase */}
+          {(() => {
+            const activeStep = workflowSteps.find((s) => s.step === activeWorkflowStep)!;
+
+            return (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-brand-charcoal/80 border border-white/10 rounded-3xl p-6 sm:p-10 backdrop-blur-xl shadow-2xl">
+                {/* Left: Step Details */}
+                <div className="lg:col-span-7 space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-brand-gold/15 border border-brand-gold/30 text-brand-gold flex items-center justify-center font-bold text-sm">
+                      0{activeStep.step}
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-brand-gold font-semibold">
+                        Stage {activeStep.step} of 5
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl font-serif text-brand-cream font-medium">
+                        {activeStep.name}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <p className="text-brand-gold/90 font-medium text-sm sm:text-base leading-snug">
+                    {activeStep.subtitle}
+                  </p>
+
+                  <p className="text-brand-muted text-xs sm:text-sm leading-relaxed text-pretty">
+                    {activeStep.description}
+                  </p>
+
+                  <div className="space-y-2.5 pt-2">
+                    {activeStep.deliverables.map((d, i) => (
+                      <div key={i} className="flex items-center gap-2.5 text-xs text-brand-cream/90">
+                        <div className="w-4 h-4 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5" />
+                        </div>
+                        <span>{d}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Step Control Buttons */}
+                  <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                    <button
+                      onClick={() => setActiveWorkflowStep((prev) => (prev > 1 ? prev - 1 : 5))}
+                      className="py-2 px-3.5 rounded-xl bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/10 text-xs font-medium transition-all"
+                    >
+                      ← Previous
+                    </button>
+                    <button
+                      onClick={() => setActiveWorkflowStep((prev) => (prev < 5 ? prev + 1 : 1))}
+                      className="py-2 px-4 rounded-xl bg-brand-gold text-brand-dark font-semibold text-xs hover:bg-brand-goldHover transition-all flex items-center gap-1.5 shadow-md shadow-brand-gold/15"
+                    >
+                      <span>Next: {activeWorkflowStep === 5 ? 'Step 1' : workflowSteps[activeWorkflowStep].shortName}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                    <Link
+                      href="/desk"
+                      className="ml-auto text-xs text-brand-gold hover:underline hidden sm:inline-flex items-center gap-1"
+                    >
+                      Try in Live Workspace ↗
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Right: Live Realistic Preview Card */}
+                <div className="lg:col-span-5">
+                  <div className="bg-brand-dark/90 border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4 relative overflow-hidden">
+                    <div className="flex items-center justify-between pb-3 border-b border-white/5">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-brand-muted">
+                        {activeStep.previewCard.stepBadge}
+                      </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${activeStep.previewCard.statusClass}`}>
+                        {activeStep.previewCard.status}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="text-base font-serif font-medium text-brand-cream">
+                        {activeStep.previewCard.title}
+                      </div>
+                      <div className="text-xs text-brand-gold font-medium">
+                        {activeStep.previewCard.clientName}
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-brand-surface/70 border border-white/5 space-y-2 text-xs">
+                      <div className="flex items-center gap-1.5 text-brand-muted">
+                        <MapPin className="w-3.5 h-3.5 text-brand-gold flex-shrink-0" />
+                        <span className="truncate">{activeStep.previewCard.venue}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-brand-muted">
+                        <Calendar className="w-3.5 h-3.5 text-brand-gold flex-shrink-0" />
+                        <span>{activeStep.previewCard.date}</span>
+                      </div>
+                      <div className="text-[11px] text-brand-muted/90 font-mono">
+                        {activeStep.previewCard.budget}
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-between gap-2">
+                      <span className="text-[11px] text-brand-cream/90 font-medium truncate">
+                        {activeStep.previewCard.actionSnippet}
+                      </span>
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                    </div>
+
+                    <div className="text-[10px] text-brand-muted text-center pt-1">
+                      Concierge Support: +91 91884 44859
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
         </div>
       </section>

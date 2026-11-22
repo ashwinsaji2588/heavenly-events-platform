@@ -32,7 +32,7 @@ async function sanitizeDatabase() {
           name: 'Occasion Desk Studio',
           slug: defaultOrg.slug === 'heavenly-events' ? 'occasion-desk-demo' : defaultOrg.slug,
           email: defaultOrg.email?.includes('heavenlyevents.in') ? 'demo@occasiondesk.com' : defaultOrg.email,
-          phone: defaultOrg.phone === '+919074624023' ? '+919876543210' : defaultOrg.phone,
+          phone: '+919188444859',
         },
       });
       console.log(`✅ Organization sanitized: ${defaultOrg.name} (${defaultOrg.id})`);
@@ -42,7 +42,7 @@ async function sanitizeDatabase() {
           name: 'Occasion Desk Studio',
           slug: 'occasion-desk-demo',
           email: 'demo@occasiondesk.com',
-          phone: '+919876543210',
+          phone: '+919188444859',
           settings: {
             city: 'Kollam',
             state: 'Kerala',
@@ -60,7 +60,7 @@ async function sanitizeDatabase() {
       data: {
         name: 'Occasion Desk Studio',
         email: 'demo@occasiondesk.com',
-        phone: '+919876543210',
+        phone: '+919188444859',
       },
     });
 
@@ -71,13 +71,14 @@ async function sanitizeDatabase() {
       update: {
         fullName: 'Alex Morgan (Principal Planner)',
         role: 'SUPER_ADMIN',
+        phone: '+919188444859',
         orgId: defaultOrg.id,
       },
       create: {
         orgId: defaultOrg.id,
         email: 'demo@occasiondesk.com',
         fullName: 'Alex Morgan (Principal Planner)',
-        phone: '+919876543210',
+        phone: '+919188444859',
         role: 'SUPER_ADMIN',
         passwordHash: demoPassword,
       },

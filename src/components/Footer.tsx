@@ -96,8 +96,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@occasiondesk.com" className="hover:text-brand-gold transition-colors">
-                  Direct Concierge Support
+                <a
+                  href="https://wa.me/919188444859?text=Hello%20Occasion%20Desk!%20I%20would%20like%20to%20learn%20more%20about%20onboarding%20our%20firm."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-brand-gold transition-colors flex items-center gap-1.5"
+                >
+                  <span>WhatsApp Concierge (+91 91884 44859)</span>
+                </a>
+              </li>
+              <li>
+                <a href="tel:+919188444859" className="hover:text-brand-gold transition-colors">
+                  Direct Line: +91 91884 44859
                 </a>
               </li>
             </ul>

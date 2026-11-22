@@ -81,7 +81,7 @@ export async function POST(req: Request) {
 
     // Pre-compose WhatsApp confirmation link for the agency's primary contact
     const orgName = org.name && org.name !== 'Heavenly Events' ? org.name : 'Occasion Desk Workspace';
-    const cleanPhone = (org.phone || '').replace(/[^0-9]/g, '');
+    const cleanPhone = (org.phone || '9188444859').replace(/[^0-9]/g, '');
     const greetingMsg = encodeURIComponent(
       `Hello ${orgName}! I just submitted an inquiry for my ${lead.occasionType} (Ref: ${lead.id.slice(0, 8)}). Looking forward to discussing details!`
     );

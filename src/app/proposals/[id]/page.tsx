@@ -34,7 +34,7 @@ export default async function ProposalPage({
 
   const orgName = lead.organization?.name && lead.organization.name !== 'Heavenly Events' ? lead.organization.name : 'Occasion Desk Workspace';
   const plannerName = lead.assignedTo?.fullName || orgName;
-  const contactPhone = (lead.assignedTo?.phone || lead.organization?.phone || '').replace(/[^0-9]/g, '');
+  const contactPhone = (lead.assignedTo?.phone || lead.organization?.phone || '9188444859').replace(/[^0-9]/g, '');
   const acceptanceMsg = encodeURIComponent(
     `Hello ${plannerName}! I would like to accept Proposal ${proposal.id.slice(0, 8).toUpperCase()} for ${lead.occasionType}. Let's proceed with the booking agreement!`
   );
