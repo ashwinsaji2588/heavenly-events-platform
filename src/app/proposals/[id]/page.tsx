@@ -38,7 +38,7 @@ export default async function ProposalPage({
         <div className="flex items-center justify-between print:hidden">
           <Link href="/" className="flex items-center gap-2 text-sm text-brand-muted hover:text-brand-gold transition-colors">
             <span className="text-brand-gold font-serif">✦</span>
-            <span>Heavenly Events</span>
+            <span>{lead.organization?.name || 'Occasion Desk'}</span>
           </Link>
           <PrintProposalButton />
         </div>
@@ -50,13 +50,13 @@ export default async function ProposalPage({
             <div>
               <div className="flex items-center gap-2 text-brand-gold text-xs font-semibold uppercase tracking-wider mb-2">
                 <Sparkles className="w-4 h-4" />
-                Official Event Proposal & Quote
+                Official Event Proposal &amp; Quote
               </div>
               <h1 className="text-3xl sm:text-4xl font-serif text-brand-cream print:text-black">
-                Heavenly Events
+                {lead.organization?.name || 'Occasion Desk'}
               </h1>
               <p className="text-xs text-brand-muted print:text-gray-600 mt-1">
-                Punalur, Kerala · +91 90746 24023 / +91 89217 44145 · hello@heavenlyevents.in
+                {lead.organization?.phone || ''} {lead.organization?.email ? `· ${lead.organization.email}` : ''}
               </p>
             </div>
 

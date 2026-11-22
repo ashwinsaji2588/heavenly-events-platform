@@ -106,6 +106,7 @@ export default function DeskDashboard({
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [team, setTeam] = useState<TeamMember[]>(initialTeam);
   const [activeTab, setActiveTab] = useState<'pipeline' | 'visits' | 'ledger' | 'team'>('pipeline');
+  const [mobileStatusFilter, setMobileStatusFilter] = useState<string>('ALL');
   const [selectedLeadForVisit, setSelectedLeadForVisit] = useState<Lead | null>(null);
   const [selectedLeadForQuote, setSelectedLeadForQuote] = useState<Lead | null>(null);
   const [visitModalOpen, setVisitModalOpen] = useState(false);
@@ -502,18 +503,18 @@ export default function DeskDashboard({
     <div className="min-h-screen bg-brand-dark text-brand-cream pb-24">
       {/* Top Bar */}
       <header className="sticky top-0 z-40 bg-brand-charcoal/90 backdrop-blur-xl border-b border-white/5 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="font-serif text-lg text-brand-cream hover:text-brand-gold transition-colors flex items-center gap-2">
-              <span className="text-brand-gold">✦</span>
-              <span className="font-bold">{organization?.name || 'Occasion Desk'}</span>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[4rem] py-2.5 sm:py-0 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Link href="/" className="font-serif text-base sm:text-lg text-brand-cream hover:text-brand-gold transition-colors flex items-center gap-1.5 min-w-0">
+              <span className="text-brand-gold flex-shrink-0">✦</span>
+              <span className="font-bold truncate max-w-[130px] xs:max-w-[170px] sm:max-w-xs">{organization?.name || 'Occasion Desk'}</span>
             </Link>
-            <span className="text-xs px-2.5 py-1 rounded-full bg-brand-gold/10 text-brand-gold font-medium border border-brand-gold/20">
+            <span className="hidden md:inline-flex text-[11px] px-2.5 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold font-medium border border-brand-gold/20 whitespace-nowrap flex-shrink-0">
               Occasion Desk CRM
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
             {/* Theme Switcher */}
             <ThemeToggle />
 
@@ -523,28 +524,28 @@ export default function DeskDashboard({
                 setBookingError(null);
                 setAddBookingModalOpen(true);
               }}
-              className="py-1.5 px-3.5 rounded-xl bg-brand-gold text-brand-dark font-bold text-xs hover:bg-brand-goldHover transition-all flex items-center gap-1.5 shadow-md shadow-brand-gold/15 active:scale-95"
+              className="py-1.5 px-2.5 sm:px-3.5 rounded-xl bg-brand-gold text-brand-dark font-bold text-xs hover:bg-brand-goldHover transition-all flex items-center gap-1 shadow-md shadow-brand-gold/15 active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>+ Add Booking</span>
+              <span>+ Booking</span>
             </button>
 
             {currentUser && (
-              <div className="flex items-center gap-2.5 pl-2 border-l border-white/10">
+              <div className="flex items-center gap-1.5 pl-1.5 sm:pl-2 border-l border-white/10">
                 <div className="text-right hidden sm:block">
                   <div className="text-xs font-medium text-brand-cream">{currentUser.fullName}</div>
                   <div className="text-[10px] text-brand-gold uppercase tracking-wider">{currentUser.role}</div>
                 </div>
                 <button
                   onClick={() => setPasswordModalOpen(true)}
-                  className="py-1.5 px-2.5 rounded-lg bg-brand-surface hover:border-brand-gold/40 border border-white/10 text-xs text-brand-muted hover:text-brand-cream flex items-center gap-1 transition-colors"
+                  className="p-1.5 sm:py-1.5 sm:px-2 rounded-lg bg-brand-surface hover:border-brand-gold/40 border border-white/10 text-xs text-brand-muted hover:text-brand-cream transition-colors flex items-center"
                   title="Update Password"
                 >
                   <Key className="w-3.5 h-3.5 text-brand-gold" />
                 </button>
                 <button
                   onClick={handleSignOut}
-                  className="py-1.5 px-2.5 rounded-lg bg-brand-surface hover:bg-red-950/60 hover:text-red-300 border border-white/10 text-xs text-brand-muted flex items-center gap-1 transition-colors"
+                  className="p-1.5 sm:py-1.5 sm:px-2 rounded-lg bg-brand-surface hover:bg-red-950/60 hover:text-red-300 border border-white/10 text-xs text-brand-muted transition-colors flex items-center"
                   title="Sign Out"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -556,127 +557,162 @@ export default function DeskDashboard({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
         {/* Header Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
-          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-5 shadow-lg">
-            <div className="text-xs uppercase tracking-wider text-brand-muted mb-1">Total Inquiries</div>
-            <div className="text-3xl font-serif font-bold text-brand-cream">{leads.length}</div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-lg">
+            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1 truncate">Total Inquiries</div>
+            <div className="text-2xl sm:text-3xl font-serif font-bold text-brand-cream">{leads.length}</div>
           </div>
-          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-5 shadow-lg">
-            <div className="text-xs uppercase tracking-wider text-brand-muted mb-1">Scheduled Visits</div>
-            <div className="text-3xl font-serif font-bold text-purple-400">{allVisits.length}</div>
+          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-lg">
+            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1 truncate">Scheduled Visits</div>
+            <div className="text-2xl sm:text-3xl font-serif font-bold text-purple-400">{allVisits.length}</div>
           </div>
-          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-5 shadow-lg">
-            <div className="text-xs uppercase tracking-wider text-brand-muted mb-1">Active Proposals</div>
-            <div className="text-3xl font-serif font-bold text-indigo-400">
+          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-lg">
+            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1 truncate">Active Proposals</div>
+            <div className="text-2xl sm:text-3xl font-serif font-bold text-indigo-400">
               {leads.filter((l) => l.status === 'PROPOSAL_SENT').length}
             </div>
           </div>
-          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-5 shadow-lg">
-            <div className="text-xs uppercase tracking-wider text-brand-muted mb-1">Confirmed Bookings</div>
-            <div className="text-3xl font-serif font-bold text-emerald-400">
+          <div className="bg-brand-charcoal/70 border border-white/5 rounded-2xl p-4 sm:p-5 shadow-lg">
+            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-brand-muted mb-1 truncate">Confirmed Bookings</div>
+            <div className="text-2xl sm:text-3xl font-serif font-bold text-emerald-400">
               {leads.filter((l) => l.status === 'BOOKED').length}
             </div>
           </div>
-          <div className="bg-brand-charcoal/70 border border-emerald-500/20 rounded-2xl p-5 shadow-lg col-span-2 sm:col-span-1">
-            <div className="text-xs uppercase tracking-wider text-emerald-400 mb-1">Advances Collected</div>
-            <div className="text-2xl font-serif font-bold text-emerald-400">
+          <div className="bg-brand-charcoal/70 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 shadow-lg col-span-2 sm:col-span-1">
+            <div className="text-[10px] sm:text-xs uppercase tracking-wider text-emerald-400 mb-1 truncate">Advances Collected</div>
+            <div className="text-2xl sm:text-3xl font-sans font-bold text-emerald-400">
               ₹{totalCollectedRevenue.toLocaleString('en-IN')}
             </div>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6 gap-4 overflow-x-auto">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setActiveTab('pipeline')}
-              className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
-                activeTab === 'pipeline'
-                  ? 'bg-brand-gold text-brand-dark'
-                  : 'text-brand-muted hover:text-brand-cream'
-              }`}
-            >
-              Pipeline Board
-            </button>
-            <button
-              onClick={() => setActiveTab('visits')}
-              className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'visits'
-                  ? 'bg-brand-gold text-brand-dark'
-                  : 'text-brand-muted hover:text-brand-cream'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              Visits &amp; Tastings ({allVisits.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('ledger')}
-              className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'ledger'
-                  ? 'bg-brand-gold text-brand-dark'
-                  : 'text-brand-muted hover:text-brand-cream'
-              }`}
-            >
-              <IndianRupee className="w-3.5 h-3.5" />
-              Ledger &amp; Advances ({allPayments.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('team')}
-              className={`py-2 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'team'
-                  ? 'bg-brand-gold text-brand-dark'
-                  : 'text-brand-muted hover:text-brand-cream'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              Partners &amp; Team ({team.length})
-            </button>
-          </div>
+        <div className="border-b border-white/10 pb-3 mb-6">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth py-1 -mx-4 px-4 sm:mx-0 sm:px-0 flex-1">
+              <button
+                onClick={() => setActiveTab('pipeline')}
+                className={`py-2 px-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
+                  activeTab === 'pipeline'
+                    ? 'bg-brand-gold text-brand-dark'
+                    : 'text-brand-muted hover:text-brand-cream'
+                }`}
+              >
+                <span>Pipeline</span><span className="hidden sm:inline"> Board</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('visits')}
+                className={`py-2 px-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'visits'
+                    ? 'bg-brand-gold text-brand-dark'
+                    : 'text-brand-muted hover:text-brand-cream'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Visits</span><span className="hidden sm:inline"> &amp; Tastings</span> ({allVisits.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('ledger')}
+                className={`py-2 px-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'ledger'
+                    ? 'bg-brand-gold text-brand-dark'
+                    : 'text-brand-muted hover:text-brand-cream'
+                }`}
+              >
+                <IndianRupee className="w-3.5 h-3.5" />
+                <span>Ledger</span><span className="hidden sm:inline"> &amp; Advances</span> ({allPayments.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('team')}
+                className={`py-2 px-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  activeTab === 'team'
+                    ? 'bg-brand-gold text-brand-dark'
+                    : 'text-brand-muted hover:text-brand-cream'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Team</span><span className="hidden sm:inline"> &amp; Partners</span> ({team.length})
+              </button>
+            </div>
 
-          <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={() => {
-                setBookingError(null);
-                setAddBookingModalOpen(true);
-              }}
-              className="py-1.5 px-3 rounded-lg bg-brand-gold/15 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold hover:text-brand-dark font-semibold text-xs transition-colors flex items-center gap-1"
-            >
-              <Plus className="w-3 h-3" /> + Add Booking
-            </button>
-            <button
-              onClick={() => {
-                setCreatedMemberResult(null);
-                setNewMemberName('');
-                setNewMemberEmail('');
-                setNewMemberPhone('+91 ');
-                setNewMemberRole('PLANNER');
-                setNewMemberPassword('Partner@2026!');
-                setTeamModalOpen(true);
-              }}
-              className="py-1.5 px-3 rounded-lg bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/10 font-medium text-xs transition-colors flex items-center gap-1"
-            >
-              <Users className="w-3 h-3" /> + Enroll Partner
-            </button>
+            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => {
+                  setBookingError(null);
+                  setAddBookingModalOpen(true);
+                }}
+                className="py-1.5 px-3 rounded-lg bg-brand-gold/15 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold hover:text-brand-dark font-semibold text-xs transition-colors flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" /> + Add Booking
+              </button>
+              <button
+                onClick={() => {
+                  setCreatedMemberResult(null);
+                  setNewMemberName('');
+                  setNewMemberEmail('');
+                  setNewMemberPhone('+91 ');
+                  setNewMemberRole('PLANNER');
+                  setNewMemberPassword('Partner@2026!');
+                  setTeamModalOpen(true);
+                }}
+                className="py-1.5 px-3 rounded-lg bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/10 font-medium text-xs transition-colors flex items-center gap-1"
+              >
+                <Users className="w-3 h-3" /> + Enroll Partner
+              </button>
+            </div>
           </div>
         </div>
 
         {/* View 1: Pipeline Board */}
         {activeTab === 'pipeline' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-            {statuses.map((col) => {
-              const colLeads = leads.filter((l) => l.status === col.key);
-              return (
-                <div key={col.key} className="flex flex-col bg-brand-charcoal/40 rounded-2xl p-4 border border-white/5">
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/5">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-brand-cream">
-                      {col.label}
-                    </span>
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full border ${col.color}`}>
-                      {colLeads.length}
-                    </span>
-                  </div>
+          <div className="space-y-4">
+            {/* Mobile Stage Selector */}
+            <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4">
+              <button
+                onClick={() => setMobileStatusFilter('ALL')}
+                className={`py-1.5 px-3 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                  mobileStatusFilter === 'ALL'
+                    ? 'bg-brand-gold text-brand-dark shadow-sm'
+                    : 'bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/5'
+                }`}
+              >
+                All Stages ({leads.length})
+              </button>
+              {statuses.map((s) => {
+                const count = leads.filter((l) => l.status === s.key).length;
+                return (
+                  <button
+                    key={s.key}
+                    onClick={() => setMobileStatusFilter(s.key)}
+                    className={`py-1.5 px-3 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                      mobileStatusFilter === s.key
+                        ? 'bg-brand-gold text-brand-dark shadow-sm'
+                        : 'bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/5'
+                    }`}
+                  >
+                    {s.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
+              {statuses
+                .filter((col) => mobileStatusFilter === 'ALL' || col.key === mobileStatusFilter)
+                .map((col) => {
+                  const colLeads = leads.filter((l) => l.status === col.key);
+                  return (
+                    <div key={col.key} className="flex flex-col bg-brand-charcoal/40 rounded-2xl p-4 border border-white/5">
+                      <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-brand-cream">
+                          {col.label}
+                        </span>
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full border ${col.color}`}>
+                          {colLeads.length}
+                        </span>
+                      </div>
 
                   <div className="space-y-4 flex-1">
                     {colLeads.length === 0 ? (
@@ -868,6 +904,7 @@ export default function DeskDashboard({
                 </div>
               );
             })}
+            </div>
           </div>
         )}
 

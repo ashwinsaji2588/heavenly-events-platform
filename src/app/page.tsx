@@ -130,7 +130,7 @@ export default function SaaSProductLandingPage() {
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={0.15}>
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal tracking-tight text-brand-cream leading-[1.08]">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal tracking-tight text-brand-cream leading-[1.15] sm:leading-[1.08]">
                 Manage Every Event, <br className="hidden sm:inline" />
                 Menu &amp; Milestone. <br />
                 <span className="italic text-brand-gold font-serif">

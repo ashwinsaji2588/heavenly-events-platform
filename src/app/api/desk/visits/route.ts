@@ -15,12 +15,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Lead, scheduled start time, and location are required.' }, { status: 400 });
     }
 
+    // Verify lead belongs to caller's tenant
+    const lead = await prisma.lead.findFirst({
+      where: { id: leadId, orgId: user.orgId },
+    });
+    if (!lead) {
+      return NextResponse.json({ error: 'Lead not found or unauthorized' }, { status: 404 });
+    }
+
     const start = new Date(scheduledStart);
     const end = scheduledEnd ? new Date(scheduledEnd) : new Date(start.getTime() + 7200000); // 2 hours default
 
     const visit = await prisma.siteVisit.create({
       data: {
-        leadId,
+        leadId: lead.id,
         scheduledStart: start,
         scheduledEnd: end,
         locationAddress,
@@ -31,7 +39,7 @@ export async function POST(req: Request) {
 
     // Automatically transition lead to VISIT_SCHEDULED if it is currently NEW or CONTACTED
     await prisma.lead.update({
-      where: { id: leadId },
+      where: { id: lead.id },
       data: { status: 'VISIT_SCHEDULED' },
     });
 

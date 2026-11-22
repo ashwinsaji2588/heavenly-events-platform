@@ -17,8 +17,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'leadId is required' }, { status: 400 });
     }
 
+    // Verify lead belongs to caller's tenant
+    const lead = await prisma.lead.findFirst({
+      where: { id: leadId, orgId: user.orgId },
+    });
+    if (!lead) {
+      return NextResponse.json({ error: 'Lead not found or unauthorized' }, { status: 404 });
+    }
+
     const payments = await prisma.payment.findMany({
-      where: { leadId },
+      where: { leadId: lead.id },
       orderBy: { receivedAt: 'desc' },
       include: {
         recordedBy: {

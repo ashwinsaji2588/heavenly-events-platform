@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Lock, Mail, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,7 +42,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-dark text-brand-cream selection:bg-brand-gold selection:text-brand-dark flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen bg-brand-dark text-brand-cream selection:bg-brand-gold selection:text-brand-dark flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-12 relative transition-colors">
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-4 group">
@@ -57,7 +62,7 @@ export default function LoginPage() {
             Sign in to Occasion Desk
           </h2>
           <p className="text-xs text-brand-muted mt-2">
-            Secure pipeline access for Heavenly Events partners & planners
+            Secure pipeline access for event studios, catering firms &amp; décor partners
           </p>
         </div>
 

@@ -15,13 +15,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Lead ID and at least one line item are required' }, { status: 400 });
     }
 
+    // Verify lead belongs to caller's tenant
+    const lead = await prisma.lead.findFirst({
+      where: { id: leadId, orgId: user.orgId },
+      include: { organization: true },
+    });
+    if (!lead) {
+      return NextResponse.json({ error: 'Lead not found or unauthorized' }, { status: 404 });
+    }
+
     const totalAmount = lineItems.reduce((acc: number, item: { amount: number }) => acc + Number(item.amount || 0), 0);
     const depositRequired = (totalAmount * Number(depositPercentage)) / 100;
     const validUntil = new Date(Date.now() + Number(validDays) * 86400000);
 
     const proposal = await prisma.proposal.create({
       data: {
-        leadId,
+        leadId: lead.id,
         totalAmount,
         depositRequired,
         lineItems,
@@ -41,7 +50,7 @@ export async function POST(req: Request) {
 
     // Update lead status to PROPOSAL_SENT
     await prisma.lead.update({
-      where: { id: leadId },
+      where: { id: lead.id },
       data: { status: 'PROPOSAL_SENT' },
     });
 
@@ -49,8 +58,9 @@ export async function POST(req: Request) {
     const proposalUrl = `/proposals/${proposal.id}`;
 
     // Generate prefilled WhatsApp notification for the client
+    const firmName = lead.organization?.name || 'Occasion Desk';
     const encodedMsg = encodeURIComponent(
-      `Hello ${proposal.lead.clientName}! Your bespoke event proposal for ${proposal.lead.occasionType} from Heavenly Events is ready for your review: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}${proposalUrl}`
+      `Hello ${proposal.lead.clientName}! Your bespoke event proposal for ${proposal.lead.occasionType} from ${firmName} is ready for your review: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}${proposalUrl}`
     );
     const clientWhatsAppUrl = `https://wa.me/${proposal.lead.clientPhone.replace(/[^0-9]/g, '')}?text=${encodedMsg}`;
 

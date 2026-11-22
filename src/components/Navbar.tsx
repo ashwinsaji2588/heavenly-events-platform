@@ -10,15 +10,15 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
         {/* Brand Wordmark */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <span className="w-9 h-9 rounded-xl bg-brand-gold/15 text-brand-gold flex items-center justify-center font-serif text-lg font-bold border border-brand-gold/30 group-hover:scale-105 transition-transform shadow-md shadow-brand-gold/5">
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0">
+          <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-brand-gold/15 text-brand-gold flex items-center justify-center font-serif text-base sm:text-lg font-bold border border-brand-gold/30 group-hover:scale-105 transition-transform shadow-md shadow-brand-gold/5 flex-shrink-0">
             ✦
           </span>
-          <div className="flex flex-col">
-            <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-brand-cream">
+          <div className="flex flex-col min-w-0">
+            <span className="font-serif text-lg sm:text-2xl font-bold tracking-tight text-brand-cream truncate">
               Occasion Desk
             </span>
-            <span className="text-[10px] tracking-widest uppercase text-brand-gold font-medium">
+            <span className="text-[9px] sm:text-[10px] tracking-wider uppercase text-brand-gold font-medium truncate whitespace-nowrap">
               Event Industry OS
             </span>
           </div>
@@ -44,14 +44,14 @@ export default function Navbar() {
         </nav>
 
         {/* Right CTA Cluster */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           {/* Light / Dark Mode Switcher */}
           <ThemeToggle />
 
           {/* Unified Partner Login */}
           <Link
             href="/login"
-            className="py-2.5 px-4 rounded-xl bg-brand-surface border border-white/10 text-xs sm:text-sm font-medium text-brand-cream hover:bg-brand-charcoal transition-all hidden sm:inline-flex items-center gap-1.5"
+            className="py-2 px-3 sm:px-4 rounded-xl bg-brand-surface border border-white/10 text-xs sm:text-sm font-medium text-brand-cream hover:bg-brand-charcoal transition-all hidden sm:inline-flex items-center gap-1.5"
           >
             Sign In
           </Link>
@@ -59,9 +59,10 @@ export default function Navbar() {
           {/* Primary Onboarding CTA */}
           <Link
             href="/onboard"
-            className="py-2.5 px-5 rounded-xl bg-brand-gold text-brand-dark text-xs sm:text-sm font-semibold hover:bg-brand-goldHover transition-all shadow-lg shadow-brand-gold/20 flex items-center gap-1.5 active:scale-95"
+            className="py-2 px-3.5 sm:py-2.5 sm:px-5 rounded-xl bg-brand-gold text-brand-dark text-xs sm:text-sm font-semibold hover:bg-brand-goldHover transition-all shadow-lg shadow-brand-gold/20 flex items-center gap-1 sm:gap-1.5 active:scale-95 whitespace-nowrap"
           >
-            <span>Onboard Business</span>
+            <span>Onboard</span>
+            <span className="hidden sm:inline">Business</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
