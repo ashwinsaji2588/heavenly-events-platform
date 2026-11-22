@@ -6,6 +6,11 @@ COPY package.json package-lock.json* ./
 RUN npm install
 
 COPY . .
+
+# Build-time environment variables for Next.js build and Prisma client generation
+ENV DATABASE_URL="postgresql://build_user:build_pass@localhost:5432/build_db?schema=public"
+ENV NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
 RUN npx prisma generate
 RUN npm run build
 
