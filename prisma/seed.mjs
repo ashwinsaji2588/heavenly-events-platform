@@ -10,19 +10,23 @@ function hashPassword(password) {
 }
 
 async function main() {
-  console.log('Seeding database for Heavenly Events...');
+  console.log('Seeding database for Occasion Desk multi-tenant platform...');
 
-  // 1. Organization
+  // 1. Primary Demo Organization
   const org = await prisma.organization.upsert({
-    where: { slug: 'heavenly-events' },
-    update: {},
+    where: { slug: 'occasion-desk-demo' },
+    update: {
+      name: 'Occasion Desk Demo Studio',
+      phone: '+919876543210',
+      email: 'demo@occasiondesk.com',
+    },
     create: {
-      name: 'Heavenly Events',
-      slug: 'heavenly-events',
-      phone: '+919074624023',
-      email: 'hello@heavenlyevents.in',
+      name: 'Occasion Desk Demo Studio',
+      slug: 'occasion-desk-demo',
+      phone: '+919876543210',
+      email: 'demo@occasiondesk.com',
       settings: {
-        city: 'Punalur',
+        city: 'Kollam',
         state: 'Kerala',
         currency: 'INR',
         whatsappEnabled: true,
@@ -30,73 +34,101 @@ async function main() {
     },
   });
 
-  console.log(`Organization ready: ${org.name} (${org.id})`);
+  console.log(`Demo Organization ready: ${org.name} (${org.id})`);
 
-  // 2. Partners
-  const defaultPassword = hashPassword('Heavenly@2026!');
+  // 2. Lead Planner / Super Admin Demo Account
+  const demoPassword = hashPassword('Demo@2026!');
 
-  const partner1 = await prisma.user.upsert({
-    where: { email: 'jomit@heavenlyevents.in' },
+  const demoUser = await prisma.user.upsert({
+    where: { email: 'demo@occasiondesk.com' },
     update: {
-      fullName: 'Jomit (Partner)',
-      phone: '+919074624023',
-    },
-    create: {
-      orgId: org.id,
-      email: 'jomit@heavenlyevents.in',
-      fullName: 'Jomit (Partner)',
-      phone: '+919074624023',
+      fullName: 'Alex Morgan (Principal Planner)',
+      phone: '+919876543210',
       role: 'SUPER_ADMIN',
-      passwordHash: defaultPassword,
-    },
-  });
-
-  const partner2 = await prisma.user.upsert({
-    where: { email: 'savio@heavenlyevents.in' },
-    update: {
-      fullName: 'Savio (Partner)',
-      phone: '+918921744145',
+      orgId: org.id,
+      passwordHash: demoPassword,
     },
     create: {
       orgId: org.id,
-      email: 'savio@heavenlyevents.in',
-      fullName: 'Savio (Partner)',
-      phone: '+918921744145',
-      role: 'PARTNER',
-      passwordHash: defaultPassword,
+      email: 'demo@occasiondesk.com',
+      fullName: 'Alex Morgan (Principal Planner)',
+      phone: '+919876543210',
+      role: 'SUPER_ADMIN',
+      passwordHash: demoPassword,
     },
   });
 
-  console.log(`Partners provisioned: ${partner1.email}, ${partner2.email}`);
+  console.log(`Demo administrator provisioned: ${demoUser.email}`);
 
-  // 3. Initial Sample Inquiries
-  const sampleLead = await prisma.lead.create({
-    data: {
-      orgId: org.id,
-      clientName: 'Rahul & Ananya',
-      clientPhone: '+919876543210',
-      clientEmail: 'rahul.ananya@example.test',
-      occasionType: 'Wedding Ceremony & Stage Décor',
-      venueName: 'The River Palace Auditorium',
-      venueCity: 'Punalur',
-      guestCount: 650,
-      budgetRange: '₹3,50,000 - ₹5,00,000',
-      status: 'VISIT_SCHEDULED',
-      assignedUserId: partner1.id,
-      notes: 'Requested traditional Kerala floral entrance with contemporary pastel stage backdrop.',
-      siteVisits: {
-        create: {
-          assignedToId: partner1.id,
-          scheduledStart: new Date(Date.now() + 86400000 * 2), // 2 days from now
-          scheduledEnd: new Date(Date.now() + 86400000 * 2 + 7200000), // 2 hours duration
-          locationAddress: 'The River Palace Auditorium, Main Road, Punalur',
-          notes: 'Inspect stage trussing points, sound console space, and bride entrance aisle dimensions.',
+  // 3. Purge legacy Heavenly Events / Jomit / Savio accounts if present
+  try {
+    const legacyUsers = await prisma.user.findMany({
+      where: {
+        email: { in: ['jomit@heavenlyevents.in', 'savio@heavenlyevents.in'] },
+      },
+    });
+
+    for (const legacyUser of legacyUsers) {
+      // Reassign any leads or visits to the demo user before removing
+      await prisma.lead.updateMany({
+        where: { assignedUserId: legacyUser.id },
+        data: { assignedUserId: demoUser.id },
+      });
+      await prisma.siteVisit.updateMany({
+        where: { assignedToId: legacyUser.id },
+        data: { assignedToId: demoUser.id },
+      });
+      await prisma.user.delete({ where: { id: legacyUser.id } });
+      console.log(`Purged legacy user: ${legacyUser.email}`);
+    }
+
+    // Rename legacy org if found
+    await prisma.organization.updateMany({
+      where: { slug: 'heavenly-events' },
+      data: {
+        name: 'Occasion Desk Studio',
+        slug: 'occasion-desk-demo',
+        email: 'demo@occasiondesk.com',
+        phone: '+919876543210',
+      },
+    });
+  } catch (err) {
+    console.log('Legacy cleanup check:', err?.message || err);
+  }
+
+  // 4. Initial Sample Booking / Inquiry for new setups
+  const existingLead = await prisma.lead.findFirst({
+    where: { orgId: org.id },
+  });
+
+  if (!existingLead) {
+    const sampleLead = await prisma.lead.create({
+      data: {
+        orgId: org.id,
+        clientName: 'Rahul & Ananya',
+        clientPhone: '+919876543210',
+        clientEmail: 'rahul.ananya@example.test',
+        occasionType: 'Wedding Ceremony & Stage Décor',
+        venueName: 'The Grand Waterfront Convention Centre',
+        venueCity: 'Kollam',
+        guestCount: 650,
+        budgetRange: '₹3,50,000 - ₹5,00,000',
+        status: 'VISIT_SCHEDULED',
+        assignedUserId: demoUser.id,
+        notes: 'Requested contemporary floral entrance with warm amber stage lighting.',
+        siteVisits: {
+          create: {
+            assignedToId: demoUser.id,
+            scheduledStart: new Date(Date.now() + 86400000 * 2), // 2 days from now
+            scheduledEnd: new Date(Date.now() + 86400000 * 2 + 7200000), // 2 hours
+            locationAddress: 'The Grand Waterfront Convention Centre, Kollam',
+            notes: 'Inspect stage rigging points, sound mixer location, and guest entrance layout.',
+          },
         },
       },
-    },
-  });
-
-  console.log(`Sample lead created: ${sampleLead.clientName} (ID: ${sampleLead.id})`);
+    });
+    console.log(`Sample booking initialized: ${sampleLead.clientName} (ID: ${sampleLead.id})`);
+  }
 }
 
 main()

@@ -1,6 +1,6 @@
-﻿# Heavenly Events Fast One-Command Deploy Script
+﻿# Occasion Desk Fast One-Command Deploy Script
 param (
-  [string]$Message = "Update Heavenly Events application"
+  [string]$Message = "Update Occasion Desk platform"
 )
 
 $ErrorActionPreference = "Stop"

@@ -83,7 +83,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="e.g. jomit@heavenlyevents.in"
+                placeholder="e.g. admin@youragency.com"
                 className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
               />
             </div>
@@ -118,33 +118,22 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Quick Partner Credentials Helper for Local Dev / Testing */}
+          {/* Quick Demo Credentials Helper */}
           <div className="pt-4 border-t border-white/5 text-xs text-brand-muted space-y-2">
             <div className="text-[11px] uppercase tracking-wider text-brand-gold/80 font-semibold">
-              Authorized Partner Accounts:
+              Live Demo Access:
             </div>
             <div className="flex flex-col gap-1 text-[11px] bg-brand-dark/50 p-3 rounded-xl border border-white/5">
               <button
                 type="button"
                 onClick={() => {
-                  setEmail('jomit@heavenlyevents.in');
-                  setPassword('Heavenly@2026!');
+                  setEmail('demo@occasiondesk.com');
+                  setPassword('Demo@2026!');
                 }}
                 className="text-left text-brand-cream hover:text-brand-gold transition-colors flex justify-between"
               >
-                <span>• Jomit (Partner)</span>
-                <span className="text-brand-muted">Click to auto-fill</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('savio@heavenlyevents.in');
-                  setPassword('Heavenly@2026!');
-                }}
-                className="text-left text-brand-cream hover:text-brand-gold transition-colors flex justify-between"
-              >
-                <span>• Savio (Partner)</span>
-                <span className="text-brand-muted">Click to auto-fill</span>
+                <span>✦ Demo Studio (Lead Planner)</span>
+                <span className="text-brand-gold">Auto-fill demo</span>
               </button>
             </div>
           </div>
@@ -155,7 +144,7 @@ export default function LoginPage() {
             Register a New Event Management Agency →
           </Link>
           <Link href="/" className="text-xs text-brand-muted hover:text-brand-cream transition-colors">
-            ← Return to Public Portfolio
+            ← Return to Home
           </Link>
         </div>
       </div>

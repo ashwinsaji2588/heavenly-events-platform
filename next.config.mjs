@@ -44,6 +44,25 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/weddings',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/receptions',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/mini-events',
+        destination: '/',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

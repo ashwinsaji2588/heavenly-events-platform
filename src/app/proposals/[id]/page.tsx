@@ -19,6 +19,7 @@ export default async function ProposalPage({
       lead: {
         include: {
           organization: true,
+          assignedTo: true,
         },
       },
     },
@@ -30,6 +31,14 @@ export default async function ProposalPage({
 
   const { lead } = proposal;
   const lineItems = (proposal.lineItems as Array<{ title: string; category?: string; amount: number; notes?: string }>) || [];
+
+  const orgName = lead.organization?.name && lead.organization.name !== 'Heavenly Events' ? lead.organization.name : 'Occasion Desk Workspace';
+  const plannerName = lead.assignedTo?.fullName || orgName;
+  const contactPhone = (lead.assignedTo?.phone || lead.organization?.phone || '').replace(/[^0-9]/g, '');
+  const acceptanceMsg = encodeURIComponent(
+    `Hello ${plannerName}! I would like to accept Proposal ${proposal.id.slice(0, 8).toUpperCase()} for ${lead.occasionType}. Let's proceed with the booking agreement!`
+  );
+  const waAcceptUrl = contactPhone ? `https://wa.me/${contactPhone}?text=${acceptanceMsg}` : null;
 
   return (
     <div className="min-h-screen bg-brand-dark text-brand-cream selection:bg-brand-gold selection:text-brand-dark py-12 px-4 sm:px-6 lg:px-8 print:bg-white print:text-black print:py-0 print:px-0">
@@ -154,28 +163,22 @@ export default async function ProposalPage({
             <p className="text-xs text-brand-muted max-w-md mx-auto">
               Confirm your acceptance directly with your assigned planner on WhatsApp or phone to finalize the agreement.
             </p>
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a
-                href={`https://wa.me/919074624023?text=${encodeURIComponent(
-                  `Hello Jomit! I would like to accept Proposal ${proposal.id.slice(0, 8).toUpperCase()} for ${lead.occasionType}. Let's proceed with the booking agreement!`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 py-3 px-5 rounded-xl bg-brand-gold text-brand-dark text-xs font-semibold hover:bg-brand-goldHover transition-colors shadow-lg"
-              >
-                Accept with Jomit (+91 90746 24023) ↗
-              </a>
-              <a
-                href={`https://wa.me/918921744145?text=${encodeURIComponent(
-                  `Hello Savio! I would like to accept Proposal ${proposal.id.slice(0, 8).toUpperCase()} for ${lead.occasionType}. Let's proceed with the booking agreement!`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 py-3 px-5 rounded-xl bg-brand-gold text-brand-dark text-xs font-semibold hover:bg-brand-goldHover transition-colors shadow-lg"
-              >
-                Accept with Savio (+91 89217 44145) ↗
-              </a>
-            </div>
+            {waAcceptUrl ? (
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href={waAcceptUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 py-3 px-6 rounded-xl bg-brand-gold text-brand-dark text-xs font-semibold hover:bg-brand-goldHover transition-colors shadow-lg active:scale-95"
+                >
+                  Accept Proposal via WhatsApp ↗
+                </a>
+              </div>
+            ) : (
+              <div className="pt-2 text-xs text-brand-gold font-medium">
+                Please contact {plannerName} to finalize and confirm your reservation.
+              </div>
+            )}
           </div>
         </div>
       </div>

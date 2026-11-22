@@ -114,7 +114,7 @@ export async function POST(req: Request) {
     if (newUser.phone) {
       const cleanPhone = newUser.phone.replace(/[^0-9]/g, '');
       const welcomeMsg = encodeURIComponent(
-        `Hello ${newUser.fullName}! You have been added to the Heavenly Events Occasion Desk portal as ${newUser.role}.\n\nPortal: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/login\nEmail: ${newUser.email}\nTemporary Password: ${password}\n\nPlease sign in to access your assigned leads and visit schedule.`
+        `Hello ${newUser.fullName}! You have been added to the Occasion Desk workspace as ${newUser.role}.\n\nPortal: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/login\nEmail: ${newUser.email}\nTemporary Password: ${password}\n\nPlease sign in to access your assigned leads and visit schedule.`
       );
       whatsappCredentialsUrl = `https://wa.me/${cleanPhone}?text=${welcomeMsg}`;
     }

@@ -80,6 +80,7 @@ export async function POST(req: Request) {
     const lead = await prisma.lead.findUnique({
       where: { id: leadId },
       include: {
+        organization: true,
         proposals: {
           orderBy: { createdAt: 'desc' },
           take: 1,
@@ -156,15 +157,16 @@ export async function POST(req: Request) {
         ? 'Final Balance Settlement'
         : 'Milestone Payment';
 
+    const orgName = lead.organization?.name && lead.organization.name !== 'Heavenly Events' ? lead.organization.name : 'Occasion Desk Workspace';
     const receiptMessage = encodeURIComponent(
       `Dear ${lead.clientName},\n\n` +
-      `Heavenly Events has received your ${typeLabel} of ₹${numericAmount.toLocaleString('en-IN')} via ${method}` +
+      `${orgName} has received your ${typeLabel} of ₹${numericAmount.toLocaleString('en-IN')} via ${method}` +
       (referenceNote ? ` (Ref: ${referenceNote})` : '') + `.\n\n` +
       `• Occasion: ${lead.occasionType}\n` +
       (agreedTotal > 0 ? `• Total Agreed Scope: ₹${agreedTotal.toLocaleString('en-IN')}\n` : '') +
       `• Total Received to Date: ₹${totalPaid.toLocaleString('en-IN')}\n` +
       (agreedTotal > 0 ? `• Remaining Balance: ₹${remainingBalance.toLocaleString('en-IN')}\n` : '') +
-      `\nThank you for choosing Heavenly Events. Your date is officially confirmed!`
+      `\nThank you for choosing ${orgName}. Your date is officially confirmed!`
     );
 
     const whatsappReceiptUrl = `https://wa.me/${cleanPhone}?text=${receiptMessage}`;

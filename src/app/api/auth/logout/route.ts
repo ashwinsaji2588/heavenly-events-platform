@@ -5,6 +5,13 @@ export async function POST() {
   const response = NextResponse.json({ success: true, message: 'Signed out successfully' });
 
   // Clear cookie
+  response.cookies.set('occasion_session', '', {
+    httpOnly: true,
+    secure: isHttps,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+  });
   response.cookies.set('heavenly_session', '', {
     httpOnly: true,
     secure: isHttps,

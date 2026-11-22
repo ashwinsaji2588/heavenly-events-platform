@@ -77,8 +77,9 @@ jobs:
             echo "=== 4. Re-launching application container from pre-built image ==="
             sudo docker compose up -d app
 
-            echo "=== 5. Syncing database schema ==="
+            echo "=== 5. Syncing database schema & sanitizing records ==="
             sudo docker exec heavenly-app npx prisma db push --skip-generate || true
+            sudo docker exec heavenly-app node scripts/sanitize-db.mjs || true
 
             echo "=== 6. Pruning old dangling images to preserve disk space ==="
             sudo docker image prune -f

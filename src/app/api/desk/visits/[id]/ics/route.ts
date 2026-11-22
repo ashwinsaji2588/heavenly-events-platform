@@ -46,11 +46,11 @@ export async function GET(
     const icsContent = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Heavenly Events//Occasion Desk//EN',
+      'PRODID:-//Occasion Desk//EN',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
       'BEGIN:VEVENT',
-      `UID:visit-${visit.id}@heavenlyevents.in`,
+      `UID:visit-${visit.id}@occasiondesk.com`,
       `DTSTAMP:${now}`,
       `DTSTART:${start}`,
       `DTEND:${end}`,

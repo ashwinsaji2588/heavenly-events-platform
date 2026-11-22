@@ -178,7 +178,7 @@ export default function OnboardPage() {
                     required
                     value={adminName}
                     onChange={(e) => setAdminName(e.target.value)}
-                    placeholder="e.g. Jomit Saji"
+                    placeholder="e.g. Alex Morgan"
                     className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
                   />
                 </div>

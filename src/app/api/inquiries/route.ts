@@ -15,6 +15,7 @@ export async function POST(req: Request) {
       guestCount,
       budgetRange,
       notes,
+      orgSlug,
     } = body;
 
     // Validation
@@ -25,14 +26,22 @@ export async function POST(req: Request) {
       );
     }
 
-    // Resolve Organization (Default: heavenly-events)
-    const org = await prisma.organization.findUnique({
-      where: { slug: 'heavenly-events' },
-    });
+    // Resolve Organization (dynamically by slug or fallback to first active org)
+    let org = null;
+    if (orgSlug) {
+      org = await prisma.organization.findUnique({
+        where: { slug: orgSlug },
+      });
+    }
+    if (!org) {
+      org = await prisma.organization.findFirst({
+        orderBy: { createdAt: 'asc' },
+      });
+    }
 
     if (!org) {
       return NextResponse.json(
-        { error: 'Organization configuration error.' },
+        { error: 'Organization configuration error. No active workspace found.' },
         { status: 500 }
       );
     }
@@ -47,7 +56,7 @@ export async function POST(req: Request) {
         occasionType: occasionType.trim(),
         targetDate: targetDate ? new Date(targetDate) : null,
         venueName: venueName?.trim() || null,
-        venueCity: venueCity?.trim() || 'Punalur',
+        venueCity: venueCity?.trim() || 'Kollam',
         guestCount: guestCount ? parseInt(guestCount, 10) : null,
         budgetRange: budgetRange?.trim() || null,
         notes: notes?.trim() || null,
@@ -65,25 +74,24 @@ export async function POST(req: Request) {
         changes: {
           clientName: lead.clientName,
           occasionType: lead.occasionType,
-          source: 'public_portfolio',
+          source: 'inquiry_api',
         },
       },
     });
 
-    // Pre-compose WhatsApp direct confirmation links for both partners
+    // Pre-compose WhatsApp confirmation link for the agency's primary contact
+    const orgName = org.name && org.name !== 'Heavenly Events' ? org.name : 'Occasion Desk Workspace';
+    const cleanPhone = (org.phone || '').replace(/[^0-9]/g, '');
     const greetingMsg = encodeURIComponent(
-      `Hello Heavenly Events! I just submitted an inquiry for my ${lead.occasionType} (Ref: ${lead.id.slice(0, 8)}). Looking forward to discussing details!`
+      `Hello ${orgName}! I just submitted an inquiry for my ${lead.occasionType} (Ref: ${lead.id.slice(0, 8)}). Looking forward to discussing details!`
     );
-    const whatsappUrl1 = `https://wa.me/919074624023?text=${greetingMsg}`;
-    const whatsappUrl2 = `https://wa.me/918921744145?text=${greetingMsg}`;
+    const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${greetingMsg}` : '';
 
     return NextResponse.json({
       success: true,
       leadId: lead.id,
       message: 'Your inquiry has been received by our lead planners.',
-      whatsappUrl: whatsappUrl1,
-      whatsappPartner1: whatsappUrl1,
-      whatsappPartner2: whatsappUrl2,
+      whatsappUrl,
     });
   } catch (error) {
     console.error('Failed to create inquiry:', error);

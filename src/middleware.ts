@@ -6,7 +6,9 @@ export function middleware(request: NextRequest) {
 
   // Protect /desk and all /api/desk/* endpoints
   if (pathname.startsWith('/desk') || pathname.startsWith('/api/desk')) {
-    const sessionCookie = request.cookies.get('heavenly_session')?.value;
+    const sessionCookie =
+      request.cookies.get('occasion_session')?.value ||
+      request.cookies.get('heavenly_session')?.value;
 
     if (!sessionCookie) {
       if (pathname.startsWith('/api/')) {

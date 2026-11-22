@@ -181,7 +181,7 @@ export async function POST(req: Request) {
     );
 
     response.cookies.set({
-      name: 'heavenly_session',
+      name: 'occasion_session',
       value: token,
       httpOnly: true,
       secure: isHttps,

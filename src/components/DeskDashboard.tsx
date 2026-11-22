@@ -199,7 +199,7 @@ export default function DeskDashboard({
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [newMemberPhone, setNewMemberPhone] = useState('+91 ');
   const [newMemberRole, setNewMemberRole] = useState('PLANNER');
-  const [newMemberPassword, setNewMemberPassword] = useState('Heavenly@2026!');
+  const [newMemberPassword, setNewMemberPassword] = useState('Desk@2026!');
   const [createdMemberResult, setCreatedMemberResult] = useState<{ user: TeamMember; whatsappCredentialsUrl: string | null } | null>(null);
 
   // Password Change State
@@ -519,7 +519,7 @@ export default function DeskDashboard({
                 <span className="text-[10px] sm:text-[11px] text-brand-gold font-medium leading-none truncate flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
                   <span className="truncate max-w-[130px] xs:max-w-[170px] sm:max-w-[240px] text-brand-muted hover:text-brand-cream">
-                    {organization?.name || 'Workspace'}
+                    {organization?.name && organization.name !== 'Heavenly Events' ? organization.name : 'Workspace'}
                   </span>
                 </span>
               </div>
@@ -1100,8 +1100,9 @@ export default function DeskDashboard({
                     <tbody className="divide-y divide-white/5">
                       {allPayments.map((p) => {
                         const cleanPhone = (p.leadPhone || '').replace(/[^0-9]/g, '');
+                        const firmDisplayName = organization?.name && organization.name !== 'Heavenly Events' ? organization.name : 'Occasion Desk Workspace';
                         const msg = encodeURIComponent(
-                          `Dear ${p.leadName},\n\nPayment confirmation from Heavenly Events:\nReceived ₹${Number(p.amount).toLocaleString('en-IN')} via ${p.method}${p.referenceNote ? ` (Ref: ${p.referenceNote})` : ''} for ${p.occasion}.\n\nThank you for choosing Heavenly Events!`
+                          `Dear ${p.leadName},\n\nPayment confirmation from ${firmDisplayName}:\nReceived ₹${Number(p.amount).toLocaleString('en-IN')} via ${p.method}${p.referenceNote ? ` (Ref: ${p.referenceNote})` : ''} for ${p.occasion}.\n\nThank you for choosing ${firmDisplayName}!`
                         );
                         const waUrl = `https://wa.me/${cleanPhone}?text=${msg}`;
 
@@ -1168,7 +1169,7 @@ export default function DeskDashboard({
                   setNewMemberEmail('');
                   setNewMemberPhone('+91 ');
                   setNewMemberRole('PLANNER');
-                  setNewMemberPassword('Heavenly@2026!');
+                  setNewMemberPassword('Desk@2026!');
                   setTeamModalOpen(true);
                 }}
                 className="py-2.5 px-4 rounded-xl bg-brand-gold text-brand-dark font-semibold text-xs hover:bg-brand-goldHover transition-all flex items-center gap-1.5 shadow-md shadow-brand-gold/15"
@@ -1614,7 +1615,7 @@ export default function DeskDashboard({
                       type="text"
                       value={paymentRef}
                       onChange={(e) => setPaymentRef(e.target.value)}
-                      placeholder="e.g. GPay to Jomit, UTR #93847"
+                      placeholder="e.g. GPay, Bank Transfer, UTR #93847"
                       className="w-full bg-brand-dark border border-white/10 rounded-xl px-4 py-2.5 text-sm text-brand-cream focus:border-brand-gold outline-none"
                     />
                   </div>
@@ -1785,7 +1786,7 @@ export default function DeskDashboard({
                       </label>
                       <button
                         type="button"
-                        onClick={() => setNewMemberPassword(`Heavenly@${Math.floor(1000 + Math.random() * 9000)}!`)}
+                        onClick={() => setNewMemberPassword(`Desk@${Math.floor(1000 + Math.random() * 9000)}!`)}
                         className="text-[10px] text-brand-gold hover:underline"
                       >
                         Auto-generate

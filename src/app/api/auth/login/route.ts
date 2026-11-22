@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     const isHttps = process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false;
 
     // Set HTTP-only secure cookie
-    response.cookies.set('heavenly_session', token, {
+    response.cookies.set('occasion_session', token, {
       httpOnly: true,
       secure: isHttps,
       sameSite: 'lax',

@@ -96,7 +96,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="https://wa.me/919074624023?text=Hello%20Occasion%20Desk!%20I%20would%20like%20to%20learn%20more%20about%20onboarding%20our%20firm." target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold transition-colors">
+                <a href="mailto:support@occasiondesk.com" className="hover:text-brand-gold transition-colors">
                   Direct Concierge Support
                 </a>
               </li>

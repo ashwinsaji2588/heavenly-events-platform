@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 import { createHmac, scryptSync, timingSafeEqual, randomBytes } from 'node:crypto';
 
-const SESSION_SECRET = process.env.SESSION_SECRET || 'heavenly-events-super-secure-production-secret-2026';
-const COOKIE_NAME = 'heavenly_session';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'occasion-desk-super-secure-production-secret-2026';
+export const COOKIE_NAME = 'occasion_session';
 
 export interface SessionUser {
   id: string;
