@@ -78,8 +78,8 @@ jobs:
             sudo docker compose up -d app
 
             echo "=== 5. Syncing database schema & sanitizing records ==="
-            sudo docker exec heavenly-app npx prisma db push --skip-generate || true
-            sudo docker exec heavenly-app node scripts/sanitize-db.mjs || true
+            sudo docker exec occasion-app npx prisma db push --skip-generate || sudo docker exec heavenly-app npx prisma db push --skip-generate || true
+            sudo docker exec occasion-app node scripts/sanitize-db.mjs || sudo docker exec heavenly-app node scripts/sanitize-db.mjs || true
 
             echo "=== 6. Pruning old dangling images to preserve disk space ==="
             sudo docker image prune -f
@@ -98,7 +98,7 @@ jobs:
 
             if [ $SUCCESS -ne 1 ]; then
               echo "❌ Health check timed out after 24 seconds"
-              sudo docker logs --tail 30 heavenly-app
+              sudo docker logs --tail 30 occasion-app || sudo docker logs --tail 30 heavenly-app
               exit 1
             fi
 

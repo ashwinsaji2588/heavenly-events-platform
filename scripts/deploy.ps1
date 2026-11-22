@@ -24,8 +24,9 @@ $remoteCmd = @"
 cd ~/heavenly-events-platform &&
 git pull origin main &&
 sudo docker compose build app &&
-sudo docker compose up -d app &&
-sudo docker exec heavenly-app npx prisma db push --skip-generate || true &&
+sudo docker stop heavenly-app 2>/dev/null || true &&
+sudo docker compose up -d &&
+(sudo docker exec occasion-app npx prisma db push --skip-generate || sudo docker exec heavenly-app npx prisma db push --skip-generate || true) &&
 echo '=== Live Health Check ===' &&
 curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000
 "@

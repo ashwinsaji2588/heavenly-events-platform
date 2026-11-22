@@ -1,9 +1,9 @@
-name: heavenly-events
+name: occasion-desk
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: heavenly-postgres
+    container_name: occasion-postgres
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-heavenly}
@@ -20,20 +20,23 @@ services:
       retries: 5
 
   app:
-    image: ${APP_IMAGE:-ghcr.io/ashwinsaji2588/heavenly-events-platform:latest}
+    image: ${APP_IMAGE:-ghcr.io/ashwinsaji2588/occasion-desk:latest}
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: heavenly-app
+    container_name: occasion-app
     restart: always
     ports:
-      - "${APP_PORT:-3001}:3000"
+      - "${APP_PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-heavenly}:${POSTGRES_PASSWORD:-heavenly_secret}@postgres:5432/${POSTGRES_DB:-heavenly_events}?schema=public
       PORT: 3000
       SESSION_SECRET: ${SESSION_SECRET:-occasion-desk-super-secure-production-secret-2026}
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3001}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
