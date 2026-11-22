@@ -2391,15 +2391,18 @@ export default function DeskDashboard({
               </button>
             </div>
 
-            {/* Overall Progress Bar */}
-            <div className="p-4 rounded-xl bg-brand-dark/80 border border-white/5 space-y-2">
+            {/* Overall Progress Bar with Dynamic Gradient & Emil Kowalski Motion */}
+            <div className="p-4 rounded-xl bg-brand-dark/80 border border-white/5 space-y-2 shadow-inner">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-brand-muted font-medium">Lifecycle Completion</span>
+                <span className="text-brand-muted font-medium flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-brand-gold animate-pulse" />
+                  <span>Lifecycle Completion</span>
+                </span>
                 <span className="font-mono text-brand-gold font-bold">{getWorkflowProgress(selectedLeadForWorkflow)}%</span>
               </div>
-              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden p-0.5">
                 <div
-                  className="h-full bg-brand-gold rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-brand-gold via-emerald-400 to-indigo-400 rounded-full transition-all duration-500 ease-out shadow-sm"
                   style={{ width: `${getWorkflowProgress(selectedLeadForWorkflow)}%` }}
                 />
               </div>

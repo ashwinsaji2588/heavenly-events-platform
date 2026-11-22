@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createHmac, randomInt } from 'node:crypto';
-import { sanitizeEmail, sanitizePhone, sanitizeString } from '@/lib/sanitize';
+import { sanitizeEmail } from '@/lib/sanitize';
+import { sendPasswordResetOtpEmail } from '@/lib/resend';
 
 const SESSION_SECRET = process.env.SESSION_SECRET || 'occasion-desk-super-secure-production-secret-2026';
 
@@ -9,11 +10,10 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const rawIdentifier = body.identifier ? String(body.identifier).trim() : '';
-    const deliveryMethod = body.deliveryMethod === 'EMAIL' ? 'EMAIL' : 'WHATSAPP';
 
     if (!rawIdentifier) {
       return NextResponse.json(
-        { error: 'Please enter your registered email address or phone number.' },
+        { error: 'Please enter your registered email address.' },
         { status: 400 }
       );
     }
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const cleanEmail = sanitizeEmail(rawIdentifier);
     const cleanPhoneDigits = rawIdentifier.replace(/[^0-9]/g, '');
 
-    // Search user by email or phone
+    // Search user by email or registered phone
     const user = await prisma.user.findFirst({
       where: {
         OR: [
@@ -32,7 +32,6 @@ export async function POST(req: Request) {
       select: {
         id: true,
         email: true,
-        phone: true,
         fullName: true,
         orgId: true,
       },
@@ -42,11 +41,11 @@ export async function POST(req: Request) {
       // Security: do not leak whether account exists or not
       return NextResponse.json({
         success: true,
-        message: 'If an account matches your details, a verification code has been dispatched.',
+        message: 'If an account matches your details, a verification code has been dispatched to your email.',
       });
     }
 
-    // Generate secure 6-digit OTP
+    // Generate cryptographically random 6-digit OTP
     const otp = randomInt(100000, 999999).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
@@ -63,18 +62,16 @@ export async function POST(req: Request) {
     const signature = createHmac('sha256', SESSION_SECRET).update(payload).digest('base64url');
     const resetTicket = `${payload}.${signature}`;
 
-    // Masked Contact info for user verification UI
+    // Masked Email for user UI confirmation
     const emailParts = user.email.split('@');
     const maskedEmail = emailParts[0].slice(0, 2) + '***@' + (emailParts[1] || 'domain.com');
-    const targetPhone = user.phone || '9188444859';
-    const cleanTargetPhone = targetPhone.replace(/[^0-9]/g, '');
-    const maskedPhone = '+' + cleanTargetPhone.slice(0, 2) + ' •••••• ' + cleanTargetPhone.slice(-4);
 
-    // Pre-compose Free WhatsApp OTP dispatch message
-    const whatsappMsg = encodeURIComponent(
-      `Your Occasion Desk password reset OTP is ${otp}. Valid for 10 minutes. For security, never share this code with anyone.`
-    );
-    const whatsappUrl = `https://wa.me/${cleanTargetPhone}?text=${whatsappMsg}`;
+    // Dispatch OTP via Resend Transactional Email
+    await sendPasswordResetOtpEmail({
+      to: user.email,
+      otp,
+      userName: user.fullName,
+    });
 
     // Audit Log
     await prisma.auditLog.create({
@@ -85,7 +82,7 @@ export async function POST(req: Request) {
         entityId: user.id,
         action: 'PASSWORD_RESET_OTP_REQUESTED',
         changes: {
-          deliveryMethod,
+          deliveryMethod: 'EMAIL_RESEND',
           requestedAt: new Date(),
         },
       },
@@ -95,15 +92,14 @@ export async function POST(req: Request) {
       success: true,
       resetTicket,
       maskedEmail,
-      maskedPhone,
-      deliveryMethod,
-      whatsappUrl,
-      message: `Verification code sent to your registered ${deliveryMethod === 'EMAIL' ? 'email' : 'WhatsApp number'}.`,
+      message: `A 6-digit verification code has been sent to ${maskedEmail}.`,
+      // Expose OTP in development if Resend is not configured yet for seamless zero-barrier testing
+      devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
     });
   } catch (error) {
     console.error('Password reset request error:', error);
     return NextResponse.json(
-      { error: 'Unable to process reset request. Please try again.' },
+      { error: 'Unable to process reset request. Please check your email and try again.' },
       { status: 500 }
     );
   }

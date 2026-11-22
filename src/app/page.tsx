@@ -649,38 +649,65 @@ export default function SaaSProductLandingPage() {
             </div>
           </ScrollReveal>
 
+          {/* Connected Kinetic Progress Rail */}
+          <div className="max-w-3xl mx-auto mb-6 px-4">
+            <div className="flex items-center justify-between text-[11px] font-mono text-brand-muted mb-2">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-brand-gold animate-pulse" />
+                <span>LIFECYCLE PROGRESSION</span>
+              </span>
+              <span className="text-brand-gold font-bold">{activeWorkflowStep * 20}% COMPLETED</span>
+            </div>
+            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden p-0.5 relative">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-brand-gold via-emerald-400 to-indigo-400 transition-all duration-500 ease-out shadow-sm"
+                style={{ width: `${(activeWorkflowStep / 5) * 100}%` }}
+              />
+            </div>
+          </div>
+
           {/* Step Pill Navigation (Mobile Scrollable) */}
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 sm:justify-center">
             {workflowSteps.map((s) => {
               const Icon = s.icon;
               const isActive = activeWorkflowStep === s.step;
+              const isPast = s.step < activeWorkflowStep;
               return (
                 <button
                   key={s.step}
                   onClick={() => setActiveWorkflowStep(s.step)}
-                  className={`py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 active:scale-95 border ${
+                  className={`py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-2 active:scale-95 border ${
                     isActive
-                      ? 'bg-brand-gold text-brand-dark border-brand-gold shadow-lg shadow-brand-gold/15'
-                      : 'bg-brand-surface/70 text-brand-muted hover:text-brand-cream border-white/10'
+                      ? 'bg-brand-gold text-brand-dark border-brand-gold shadow-lg shadow-brand-gold/20 scale-[1.03] animate-badge-pop'
+                      : isPast
+                      ? 'bg-emerald-950/40 text-emerald-300 border-emerald-500/30 hover:border-emerald-500/60'
+                      : 'bg-brand-surface/70 text-brand-muted hover:text-brand-cream border-white/10 hover:border-brand-gold/30'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  {isPast ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                  ) : (
+                    <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                  )}
                   <span>{s.shortName}</span>
                 </button>
               );
             })}
           </div>
 
-          {/* Active Step Showcase */}
+          {/* Active Step Showcase with Fluid Motion Animation */}
           {(() => {
             const activeStep = workflowSteps.find((s) => s.step === activeWorkflowStep)!;
 
             return (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-brand-charcoal/80 border border-white/10 rounded-3xl p-6 sm:p-10 backdrop-blur-xl shadow-2xl">
+              <div
+                key={activeWorkflowStep}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-brand-charcoal/80 border border-white/10 rounded-3xl p-6 sm:p-10 backdrop-blur-xl shadow-2xl animate-workflow-slide"
+              >
                 {/* Left: Step Details */}
                 <div className="lg:col-span-7 space-y-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-brand-gold/15 border border-brand-gold/30 text-brand-gold flex items-center justify-center font-bold text-sm">
+                    <div className="w-10 h-10 rounded-xl bg-brand-gold/15 border border-brand-gold/30 text-brand-gold flex items-center justify-center font-bold text-sm shadow-sm">
                       0{activeStep.step}
                     </div>
                     <div>
@@ -716,34 +743,34 @@ export default function SaaSProductLandingPage() {
                   <div className="flex items-center gap-3 pt-4 border-t border-white/5">
                     <button
                       onClick={() => setActiveWorkflowStep((prev) => (prev > 1 ? prev - 1 : 5))}
-                      className="py-2 px-3.5 rounded-xl bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/10 text-xs font-medium transition-all"
+                      className="py-2.5 px-4 rounded-xl bg-brand-surface text-brand-muted hover:text-brand-cream border border-white/10 text-xs font-medium transition-all active:scale-95"
                     >
-                      ← Previous
+                      ← Previous Stage
                     </button>
                     <button
                       onClick={() => setActiveWorkflowStep((prev) => (prev < 5 ? prev + 1 : 1))}
-                      className="py-2 px-4 rounded-xl bg-brand-gold text-brand-dark font-semibold text-xs hover:bg-brand-goldHover transition-all flex items-center gap-1.5 shadow-md shadow-brand-gold/15"
+                      className="py-2.5 px-5 rounded-xl bg-brand-gold text-brand-dark font-semibold text-xs hover:bg-brand-goldHover transition-all flex items-center gap-1.5 shadow-md shadow-brand-gold/15 active:scale-95"
                     >
-                      <span>Next: {activeWorkflowStep === 5 ? 'Step 1' : workflowSteps[activeWorkflowStep].shortName}</span>
+                      <span>Advance to {activeWorkflowStep === 5 ? 'Stage 1' : `Stage 0${activeWorkflowStep + 1}`}</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                     <Link
                       href="/desk"
-                      className="ml-auto text-xs text-brand-gold hover:underline hidden sm:inline-flex items-center gap-1"
+                      className="ml-auto text-xs text-brand-gold hover:underline hidden sm:inline-flex items-center gap-1 font-medium"
                     >
-                      Try in Live Workspace ↗
+                      Open in Live Workspace ↗
                     </Link>
                   </div>
                 </div>
 
                 {/* Right: Live Realistic Preview Card */}
                 <div className="lg:col-span-5">
-                  <div className="bg-brand-dark/90 border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4 relative overflow-hidden">
+                  <div className="bg-brand-dark/90 border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4 relative overflow-hidden transition-all duration-300">
                     <div className="flex items-center justify-between pb-3 border-b border-white/5">
                       <span className="text-[10px] font-mono uppercase tracking-wider text-brand-muted">
                         {activeStep.previewCard.stepBadge}
                       </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${activeStep.previewCard.statusClass}`}>
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${activeStep.previewCard.statusClass} animate-pulse`}>
                         {activeStep.previewCard.status}
                       </span>
                     </div>
@@ -778,6 +805,15 @@ export default function SaaSProductLandingPage() {
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
                     </div>
 
+                    {/* Interactive Test-Drive Advance Trigger */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveWorkflowStep((prev) => (prev < 5 ? prev + 1 : 1))}
+                      className="w-full py-2.5 px-3 rounded-xl bg-brand-surface/90 hover:bg-brand-surface border border-white/10 hover:border-brand-gold/40 text-xs text-brand-cream font-medium transition-all flex items-center justify-center gap-1.5 active:scale-95 group"
+                    >
+                      <Zap className="w-3.5 h-3.5 text-brand-gold group-hover:scale-110 transition-transform" />
+                      <span>Test Drive Next Stage →</span>
+                    </button>
                     <div className="text-[10px] text-brand-muted text-center pt-1">
                       Concierge Support: +91 91884 44859
                     </div>
