@@ -64,7 +64,7 @@ async function sanitizeDatabase() {
       },
     });
 
-    // 2. Ensure Demo Super Admin exists
+    // 2. Ensure Demo Super Admin exists with guaranteed password
     const demoPassword = hashPassword('Demo@2026!');
     const demoUser = await prisma.user.upsert({
       where: { email: 'demo@occasiondesk.com' },
@@ -73,6 +73,7 @@ async function sanitizeDatabase() {
         role: 'SUPER_ADMIN',
         phone: '+919188444859',
         orgId: defaultOrg.id,
+        passwordHash: demoPassword,
       },
       create: {
         orgId: defaultOrg.id,

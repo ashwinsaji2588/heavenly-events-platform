@@ -25,12 +25,9 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-wider text-brand-muted">
+        <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-semibold uppercase tracking-wider text-brand-muted">
           <a href="#industries" className="hover:text-brand-cream transition-colors">
             Who It&apos;s For
-          </a>
-          <a href="#features" className="hover:text-brand-cream transition-colors">
-            Features
           </a>
           <a href="#workflows" className="hover:text-brand-cream transition-colors">
             Workflows
@@ -38,9 +35,12 @@ export default function Navbar() {
           <a href="#pricing" className="hover:text-brand-cream transition-colors">
             Pricing
           </a>
-          <Link href="/desk" className="text-brand-gold hover:text-brand-goldHover transition-colors flex items-center gap-1">
-            Live Workspace ↗
-          </Link>
+          <a href="#faq" className="hover:text-brand-cream transition-colors">
+            FAQ
+          </a>
+          <a href="#demo" className="text-brand-gold hover:text-brand-goldHover transition-colors flex items-center gap-1 font-bold">
+            Request Demo
+          </a>
         </nav>
 
         {/* Right CTA Cluster */}

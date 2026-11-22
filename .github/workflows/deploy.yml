@@ -87,12 +87,12 @@ jobs:
             echo "=== 7. Health Check ==="
             SUCCESS=0
             for i in $(seq 1 12); do
-              if curl -s -f -o /dev/null -w "%{http_code}" http://127.0.0.1:3000 | grep -q "200\|304\|307"; then
-                echo "✅ Health check passed: Next.js is responding on port 3000!"
+              if curl -s -f -o /dev/null -w "%{http_code}" http://127.0.0.1:3001 | grep -q "200\|304\|307"; then
+                echo "✅ Health check passed: Next.js is responding on port 3001!"
                 SUCCESS=1
                 break
               fi
-              echo "Waiting for Next.js app to become healthy (attempt $i/12)..."
+              echo "Waiting for Next.js app to become healthy on port 3001 (attempt $i/12)..."
               sleep 2
             done
 
