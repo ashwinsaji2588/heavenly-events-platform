@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sanitizeString, sanitizeEmail, sanitizePhone } from '@/lib/sanitize';
-import { resend } from '@/lib/resend';
 
 export async function POST(req: Request) {
   try {
@@ -95,31 +94,16 @@ export async function POST(req: Request) {
 </html>
     `.trim();
 
-    if (resend) {
-      try {
-        await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || 'Occasion Desk <onboarding@resend.dev>',
-          to: recipientEmail,
-          subject: emailSubject,
-          html: emailHtml,
-        });
-        console.log(`[Resend] Successfully delivered demo request notification to ${recipientEmail}`);
-      } catch (err) {
-        console.error('[Resend] Failed to send demo request email:', err);
-      }
-    } else {
-      console.log(`\n======================================================`);
-      console.log(`[Demo Request Lead Notification (Simulator)]`);
-      console.log(`To            : ${recipientEmail}`);
-      console.log(`Lead Name     : ${cleanName}`);
-      console.log(`Business      : ${cleanBusinessName} (${cleanBusinessType})`);
-      console.log(`Phone         : ${cleanPhone}`);
-      console.log(`Email         : ${cleanEmail}`);
-      console.log(`Monthly Volume: ${cleanMonthlyEvents}`);
-      console.log(`Requirements  : ${cleanRequirements}`);
-      console.log(`Target Phone  : ${recipientPhone}`);
-      console.log(`======================================================\n`);
-    }
+    console.log(`\n======================================================`);
+    console.log(`[Demo Request Lead Notification Received]`);
+    console.log(`To Ashwin     : ${recipientEmail} / ${recipientPhone}`);
+    console.log(`Lead Name     : ${cleanName}`);
+    console.log(`Business      : ${cleanBusinessName} (${cleanBusinessType})`);
+    console.log(`Phone         : ${cleanPhone}`);
+    console.log(`Email         : ${cleanEmail}`);
+    console.log(`Monthly Volume: ${cleanMonthlyEvents}`);
+    console.log(`Requirements  : ${cleanRequirements}`);
+    console.log(`======================================================\n`);
 
     // 2. Compose Direct WhatsApp Link to Ashwin Saji
     const cleanDigits = recipientPhone.replace(/[^0-9]/g, '');

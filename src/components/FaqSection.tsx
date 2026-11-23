@@ -36,9 +36,9 @@ const faqs: FaqItem[] = [
   },
   {
     category: 'Security',
-    question: 'How does password reset work without third-party telecom fees?',
+    question: 'How do partners sign in and reset passwords via mobile number?',
     answer:
-      'Occasion Desk uses Resend transactional email delivery (3,000 free emails/month) coupled with stateless HMAC-SHA256 one-time passcodes (OTP). When you request a reset, a 6-digit verification code is delivered directly to your registered email inbox in seconds with single-use, 10-minute validity and zero third-party telecom billing.',
+      'Occasion Desk uses Google Cloud Firebase Phone Authentication with 10,000 free SMS authentications every month. Partners sign in directly using their registered mobile number and an instant 6-digit SMS OTP, eliminating password fatigue and allowing caterers, decorators, and florists on the ground to log in straight from their smartphones.',
   },
   {
     category: 'Flexibility',

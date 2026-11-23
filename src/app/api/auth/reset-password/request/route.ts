@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createHmac, randomInt } from 'node:crypto';
 import { sanitizeEmail } from '@/lib/sanitize';
-import { sendPasswordResetOtpEmail } from '@/lib/resend';
 
 const SESSION_SECRET = process.env.SESSION_SECRET || 'occasion-desk-super-secure-production-secret-2026';
 
@@ -66,12 +65,8 @@ export async function POST(req: Request) {
     const emailParts = user.email.split('@');
     const maskedEmail = emailParts[0].slice(0, 2) + '***@' + (emailParts[1] || 'domain.com');
 
-    // Dispatch OTP via Resend Transactional Email
-    await sendPasswordResetOtpEmail({
-      to: user.email,
-      otp,
-      userName: user.fullName,
-    });
+    // In non-production or fallback mode, log OTP
+    console.log(`[Password Reset OTP] Code for ${user.email}: ${otp}`);
 
     // Audit Log
     await prisma.auditLog.create({

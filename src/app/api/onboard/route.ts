@@ -18,13 +18,14 @@ export async function POST(req: Request) {
 
     const cleanFirmName = sanitizeString(firmName, 120);
     const cleanAdminName = sanitizeString(adminName, 100);
-    const cleanEmail = sanitizeEmail(adminEmail);
     const cleanPhone = phone ? sanitizePhone(phone) : '';
+    const phoneDigits = cleanPhone.replace(/\D/g, '');
+    const cleanEmail = sanitizeEmail(adminEmail) || (phoneDigits ? `${phoneDigits}@partner.occasiondesk.com` : '');
     const cleanCity = city ? sanitizeString(city, 80) : '';
 
-    if (!cleanFirmName || !cleanAdminName || !cleanEmail || !adminPassword?.trim()) {
+    if (!cleanFirmName || !cleanAdminName || (!cleanPhone && !cleanEmail) || !adminPassword?.trim()) {
       return NextResponse.json(
-        { error: 'Valid firm name, admin name, official email, and master password are required.' },
+        { error: 'Valid firm name, admin name, mobile number or email, and master password are required.' },
         { status: 400 }
       );
     }
@@ -36,14 +37,19 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email: cleanEmail },
+    // Check if user already exists by email or phone
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          ...(cleanEmail ? [{ email: cleanEmail }] : []),
+          ...(cleanPhone ? [{ phone: cleanPhone }] : []),
+        ],
+      },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'An account with this email address already exists. Please sign in.' },
+        { error: 'An account with this mobile number or email already exists. Please sign in.' },
         { status: 409 }
       );
     }

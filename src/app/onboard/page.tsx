@@ -185,14 +185,13 @@ export default function OnboardPage() {
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-brand-muted mb-1 font-medium flex items-center gap-1">
-                    <Mail className="w-3 h-3 text-brand-gold" /> Official Sign-In Email *
+                    <Mail className="w-3 h-3 text-brand-gold" /> Official Email (Optional)
                   </label>
                   <input
                     type="email"
-                    required
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
-                    placeholder="admin@yourfirm.in"
+                    placeholder="admin@yourfirm.in (optional)"
                     className="w-full bg-brand-dark/90 border border-white/10 rounded-xl px-4 py-3 text-sm text-brand-cream focus:outline-none focus:border-brand-gold transition-colors"
                   />
                 </div>

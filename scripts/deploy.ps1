@@ -27,6 +27,7 @@ sudo docker compose build app &&
 sudo docker stop heavenly-app 2>/dev/null || true &&
 sudo docker compose up -d &&
 (sudo docker exec occasion-app npx prisma db push --skip-generate || sudo docker exec heavenly-app npx prisma db push --skip-generate || true) &&
+(sudo docker exec occasion-app node scripts/sanitize-db.mjs || sudo docker exec heavenly-app node scripts/sanitize-db.mjs || true) &&
 echo '=== Live Health Check ===' &&
 curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3001
 "@
@@ -34,4 +35,4 @@ curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3001
 Write-Host "⏳ Triggering remote Docker build on Oracle VM (144.24.139.226)..." -ForegroundColor Cyan
 ssh -i $keyPath -o StrictHostKeyChecking=no ubuntu@144.24.139.226 $remoteCmd
 
-Write-Host "🎉 Application is LIVE at http://144.24.139.226" -ForegroundColor Green
+Write-Host "🎉 Application is LIVE at http://144.24.139.226:3001" -ForegroundColor Green
